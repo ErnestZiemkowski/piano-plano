@@ -62,14 +62,14 @@ public class SeedMain {
 			admin.setName("Admin");
 			admin.setUsername("admin123");
 			admin.setEmail("admin@demo.com");
-			admin.setPassword(new BCryptPasswordEncoder().encode("admin"));
+			admin.setPassword(new BCryptPasswordEncoder().encode("admin123"));
 			admin.addRole(roleUser);
 			admin.addRole(roleAdmin);
 			
 			userAdam.setName("Adam");
 			userAdam.setUsername("adam123");
 			userAdam.setEmail("adam@demo.com");
-			userAdam.setPassword(new BCryptPasswordEncoder().encode("adam"));
+			userAdam.setPassword(new BCryptPasswordEncoder().encode("adam123"));
 			userAdam.addRole(roleUser);
 						
 			userRepository.saveAll(Arrays.asList(admin, userAdam));
