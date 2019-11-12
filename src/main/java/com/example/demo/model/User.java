@@ -38,10 +38,6 @@ public class User {
 	
 	@NotBlank
 	@Size(min = 3, max = 50)
-	private String name;
-
-	@NotBlank
-	@Size(min = 3, max = 50)
 	private String username;
 
 	@NaturalId
@@ -63,8 +59,7 @@ public class User {
 	
 	public User() {}
 
-	public User(String name, String username, String email, String password) {
-		this.name = name;
+	public User(String username, String email, String password) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
@@ -76,14 +71,6 @@ public class User {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getUsername() {

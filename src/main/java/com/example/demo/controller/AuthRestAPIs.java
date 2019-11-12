@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.exception.AppException;
 import com.example.demo.message.request.LoginForm;
 import com.example.demo.message.request.SignUpForm;
 import com.example.demo.message.response.JwtResponse;
@@ -77,29 +79,11 @@ public class AuthRestAPIs {
 	          HttpStatus.BAD_REQUEST);
 	    }
 	 
-	    // Creating user's account
-	    User user = new User(signUpRequest.getName(), signUpRequest.getUsername(), signUpRequest.getEmail(),
-    		passwordEncoder.encode(signUpRequest.getPassword()));
-	 
-	    Set<String> strRoles = signUpRequest.getRoles();
-	    Set<Role> roles = new HashSet<>();
-	 
-	    strRoles.forEach(role -> {
-	      switch (role) {
-	      case "admin":
-	        Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-	            .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-	        roles.add(adminRole);
-	 
-	        break;
-	      default:
-	        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-	            .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
-	        roles.add(userRole);
-	      }
-	    });
-	 
-	    user.setRoles(roles);
+	    User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));	 
+	    Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+	    		.orElseThrow(() -> new AppException("User Role not set."));
+	    
+	    user.setRoles(Collections.singleton(userRole));
 	    userRepository.save(user);
 	 
 	    return new ResponseEntity<>(new ResponseMessage("User registered successfully!"), HttpStatus.OK);

@@ -59,14 +59,12 @@ public class SeedMain {
 		
 		if (users.size() <= 0 || users == null) {	
 						
-			admin.setName("Admin");
 			admin.setUsername("admin123");
 			admin.setEmail("admin@demo.com");
 			admin.setPassword(new BCryptPasswordEncoder().encode("admin123"));
 			admin.addRole(roleUser);
 			admin.addRole(roleAdmin);
 			
-			userAdam.setName("Adam");
 			userAdam.setUsername("adam123");
 			userAdam.setEmail("adam@demo.com");
 			userAdam.setPassword(new BCryptPasswordEncoder().encode("adam123"));
