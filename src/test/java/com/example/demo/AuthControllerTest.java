@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -79,7 +81,7 @@ public class AuthControllerTest {
 	}	
 	
 	@Test 
-	public void signUpNonExistingUser() throws Exception {
+	public void signUpNonExistingUserTest() throws Exception {
 		
 		Gson gson = new Gson();
 		SignUpForm registerRequest = new SignUpForm("nonexistinguser", "nonexistinguser@demo.com", "nonexistinguser");
@@ -97,7 +99,7 @@ public class AuthControllerTest {
 	}
 
 	@Test 
-	public void signUpExistingUser() throws Exception {
+	public void signUpExistingUserTest() throws Exception {
 		
 		Gson gson = new Gson();
 		SignUpForm registerRequest = new SignUpForm("adam123", "adam@demo.com", "adam123");
@@ -114,6 +116,19 @@ public class AuthControllerTest {
 
 	}
 	
+	@Test
+	@WithMockUser("adam123")
+	public void getCurrentLoggedInUserTest() throws Exception {
+		
+		mockMvc
+			.perform(MockMvcRequestBuilders
+			.get("/api/auth/user/me")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.username").value("adam123"))
+			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.email").value("adam@demo.com"));
+		
+	}
 	
 	
 }
