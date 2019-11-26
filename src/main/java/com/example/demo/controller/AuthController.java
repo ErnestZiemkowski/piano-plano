@@ -40,19 +40,19 @@ import com.example.demo.security.jwt.JwtProvider;
 public class AuthController {
 
 	@Autowired
-	AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 	
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 	
 	@Autowired
-	RoleRepository roleRepository;
+	private RoleRepository roleRepository;
 	
 	@Autowired
-	PasswordEncoder passwordEncoder;
+	private PasswordEncoder passwordEncoder;
 		
 	@Autowired
-	JwtProvider jwtProvider;
+	private JwtProvider jwtProvider;
 
 	@GetMapping("/user/me")
 	@PreAuthorize("hasRole('USER')")
