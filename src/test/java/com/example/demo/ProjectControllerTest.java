@@ -16,11 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.example.demo.message.request.ProjectRequest;
 import com.google.gson.Gson;
 
-import jdk.net.SocketFlow.Status;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.hamcrest.Matchers;
 
 
 @RunWith(SpringRunner.class)
@@ -41,17 +37,14 @@ public class ProjectControllerTest {
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[0].id").exists())
-			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[0].startDate").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[0].name").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[0].description").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[0].creator").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[1].id").exists())
-			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[1].startDate").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[1].name").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[1].description").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[1].creator").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].id").exists())
-			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].startDate").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].name").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].description").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].creator").exists());
@@ -109,6 +102,4 @@ public class ProjectControllerTest {
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.description").value("This is updated description"));
 		
 	}	
-	
-	
 }

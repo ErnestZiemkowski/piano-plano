@@ -1,6 +1,7 @@
 package com.example.demo.message.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProjectResponse {
 
@@ -14,14 +15,17 @@ public class ProjectResponse {
 	
 	private UserProfile creator;
 
+	private List<KanbanCategoryResponse> kanbanCategoryResponses;
+	
 	public ProjectResponse() {}
 	
-	public ProjectResponse(Long id, LocalDateTime startDate, String name, String description, UserProfile creator) {
+	public ProjectResponse(Long id, LocalDateTime startDate, String name, String description, UserProfile creator, List<KanbanCategoryResponse> kanbanCategoryResponses) {
 		this.id = id;
 		this.startDate = startDate;
 		this.name = name;
 		this.description = description;
 		this.creator = creator;
+		this.kanbanCategoryResponses = kanbanCategoryResponses;
 	}
 
 	public Long getId() {
@@ -64,5 +68,16 @@ public class ProjectResponse {
 		this.creator = creator;
 	}
 
+	public List<KanbanCategoryResponse> getKanbanCategoryResponses() {
+		return kanbanCategoryResponses;
+	}
+	
+	public void addKanbanCategoryResponse(KanbanCategoryResponse kanbanCategoryResponse) {
+		this.kanbanCategoryResponses.add(kanbanCategoryResponse);
+	}
+	
+	public void removeKanbanCategoryResponse(KanbanCategoryResponse kanbanCategoryResponse) {
+		this.kanbanCategoryResponses.remove(kanbanCategoryResponse);
+	}
 	
 }

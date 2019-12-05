@@ -14,11 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Set;
-
 import com.example.demo.message.request.LoginForm;
 import com.example.demo.message.request.SignUpForm;
-import com.example.demo.model.RoleName;
 import com.google.gson.Gson;
 
 @RunWith(SpringRunner.class)
@@ -129,6 +126,5 @@ public class AuthControllerTest {
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.email").value("adam@demo.com"));
 		
 	}
-	
 	
 }

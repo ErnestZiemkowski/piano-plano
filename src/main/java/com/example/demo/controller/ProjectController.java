@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.message.request.ProjectRequest;
-import com.example.demo.message.response.ProjectResponse;
 import com.example.demo.message.response.ResponseMessage;
-import com.example.demo.message.response.UserProfile;
 import com.example.demo.model.Project;
 import com.example.demo.services.ProjectService;
 
@@ -31,36 +28,23 @@ public class ProjectController {
 
 	@Autowired
 	private ProjectService projectService;
-	
-	
+
 	@GetMapping()
 	@PreAuthorize("hasRole('USER')")
-	public List<ProjectResponse> getProjects() {
+	public List<Project> getProjects() {
 		return projectService.getAllProjects();
 	}	
 	
 	@PostMapping()
 	@PreAuthorize("hasRole('USER')")
-	public ProjectResponse createProject(@Valid @RequestBody ProjectRequest projectRequest) {
-		Project project = projectService.createProject(projectRequest);
-		UserProfile userProfile = new UserProfile(
-				project.getCreator().getUsername(), 
-				project.getCreator().getEmail());
-
-		return new ProjectResponse(project.getId(), project.getCreateDateTime(), project.getName(), project.getDescription(), userProfile);
+	public Project createProject(@Valid @RequestBody ProjectRequest projectRequest) {
+		return projectService.createProject(projectRequest);
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER')")
-	public ProjectResponse updateProject(@RequestBody ProjectRequest projectRequest, @PathVariable Long id) {
-		Project project = projectService.updateProject(projectRequest, id);
-		
-		UserProfile userProfile = new UserProfile(
-				project.getCreator().getUsername(), 
-				project.getCreator().getEmail());
-
-		return new ProjectResponse(project.getId(), project.getCreateDateTime(), project.getName(), project.getDescription(), userProfile);
-
+	public Project updateProject(@RequestBody ProjectRequest projectRequest, @PathVariable Long id) {
+		return projectService.updateProject(projectRequest, id);
 	}
 	
 	@DeleteMapping("/{id}")

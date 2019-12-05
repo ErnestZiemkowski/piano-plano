@@ -11,10 +11,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.model.Card;
+import com.example.demo.model.KanbanCategory;
 import com.example.demo.model.Project;
 import com.example.demo.model.Role;
 import com.example.demo.model.RoleName;
 import com.example.demo.model.User;
+import com.example.demo.repository.CardRepository;
 import com.example.demo.repository.ProjectRepository;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
@@ -33,6 +36,9 @@ public class SeedMain {
 	@Autowired
 	private ProjectRepository projectRepository;
 	
+	@Autowired
+	private CardRepository cardRepository;
+	
 	private Role roleAdmin = new Role();
 	private Role roleUser = new Role();
 	
@@ -46,12 +52,29 @@ public class SeedMain {
 	private Project projectFive = new Project();
 	private Project projectSix = new Project();
 	
+	private Card cardOne = new Card("Card One", "Description", 1, null);
+	private Card cardTwo = new Card("Card Two", "Description", 2, null);
+	private Card cardThree = new Card("Card Three", "Description", 3, null);
+	
+	private Card cardFour = new Card("Card Four", "Description", 1, null);
+	private Card cardFive = new Card("Card Five", "Description", 2, null);
+
+	private Card cardSix = new Card("Card Six", "Description", 1, null);
+	private Card cardSeven = new Card("Card Seven", "Description", 2, null);
+
+	
+	private KanbanCategory categoryTodo = new KanbanCategory("ToDo", 4);
+	private KanbanCategory categoryInProgress = new KanbanCategory("InProgress", 3);
+	private KanbanCategory categoryQA = new KanbanCategory("Q&A", 2);
+	private KanbanCategory categoryDone = new KanbanCategory("Done", 1);
+	
 	
 	@EventListener
 	public void seed(ContextRefreshedEvent event) {
 		seedRolesTable();
 		seedUsersTable();
 		seedProjectsTable();
+		seedCardsTable();
 	}
 	
 	private void seedRolesTable() {
@@ -98,7 +121,11 @@ public class SeedMain {
 			projectOne.setName("Project One");
 			projectOne.setDescription("This is Project One");
 			projectOne.setCreator(userAdam);
-
+			projectOne.addKanbanCategory(categoryTodo);
+			projectOne.addKanbanCategory(categoryInProgress);
+			projectOne.addKanbanCategory(categoryQA);
+			projectOne.addKanbanCategory(categoryDone);
+			
 			projectTwo.setName("Project Two");
 			projectTwo.setDescription("This is Project Two");
 			projectTwo.setCreator(userAdam);
@@ -118,10 +145,31 @@ public class SeedMain {
 			projectSix.setName("Project Six");
 			projectSix.setDescription("This is Project Six");
 			projectSix.setCreator(userAdam);
-
+			
 			projectRepository.saveAll(Arrays.asList(projectOne, projectTwo, projectThree, projectFour, projectFive, projectSix));
 		} else {
 			logger.info("Projects Seeding Not Required");
+		}
+	}
+	
+	private void seedCardsTable() {
+		List<Card> cards = cardRepository.findAll();
+		
+		if (cards.size() == 0 || cards == null) {
+			
+			categoryDone.addCard(cardOne);
+			categoryDone.addCard(cardTwo);
+			categoryDone.addCard(cardThree);
+			
+			categoryInProgress.addCard(cardFour);
+			categoryInProgress.addCard(cardFive);
+			
+			categoryQA.addCard(cardSix);
+			categoryQA.addCard(cardSeven);
+			
+			cardRepository.saveAll(Arrays.asList(cardOne, cardTwo, cardThree, cardFour, cardFive, cardSix, cardSeven));
+		} else {
+			logger.info("Cards Seeding Not Required");			
 		}
 	}
 }

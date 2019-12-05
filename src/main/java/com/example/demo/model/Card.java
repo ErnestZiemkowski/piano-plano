@@ -1,31 +1,28 @@
 package com.example.demo.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @DynamicUpdate
-@Table(name = "projects")
-public class Project {
-	
+@Table(name = "cards")
+public class Card {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -33,29 +30,30 @@ public class Project {
 	@CreationTimestamp
 	private LocalDateTime createDateTime;
 	
-	@Size(min = 5, max = 100)
-	private String name;
+	@Size(min = 5, max = 50)
+	private String title;
 	
-	@Size(max = 500)
+	@Size(min = 5, max = 150)	
 	private String description;
+	
+	@Min(value = 0)
+	private int position;
 	
 	@OneToOne
 	@JoinColumn(name = "user_id")
 	private User creator;
-
-	@OneToMany(
-		fetch = FetchType.EAGER,
-		mappedBy = "project", 
-		cascade = CascadeType.ALL, 
-		orphanRemoval = true)
-	@JsonManagedReference
-	private List<KanbanCategory> kanbanCategories = new ArrayList<>();
 	
-	public Project() {}
+	@ManyToOne
+	@JoinColumn(name = "kanban_category_id")
+	@JsonBackReference
+	private KanbanCategory kanbanCategory;
+	
+	public Card() {}
 
-	public Project(String name, String description, User creator) {
-		this.name = name;
+	public Card(String title, String description, int position, User creator) {
+		this.title = title;
 		this.description = description;
+		this.position = position;
 		this.creator = creator;
 	}
 
@@ -74,13 +72,13 @@ public class Project {
 	public void setCreateDateTime(LocalDateTime createDateTime) {
 		this.createDateTime = createDateTime;
 	}
-
-	public String getName() {
-		return name;
+	
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getDescription() {
@@ -89,6 +87,14 @@ public class Project {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public int getPosition() {
+		return position;
 	}
 
 	public User getCreator() {
@@ -99,18 +105,12 @@ public class Project {
 		this.creator = creator;
 	}
 
-	public List<KanbanCategory> getKanbanCategories() {
-		return kanbanCategories;
+	public KanbanCategory getKanbanCategory() {
+		return kanbanCategory;
 	}
 
-	public void addKanbanCategory(KanbanCategory kanbanCategory) {
-		this.kanbanCategories.add(kanbanCategory);
-		kanbanCategory.setProject(this);
+	public void setKanbanCategory(KanbanCategory kanbanCategory) {
+		this.kanbanCategory = kanbanCategory;
 	}
-
-	public void removeKanbanCategory(KanbanCategory kanbanCategory) {
-		this.kanbanCategories.remove(kanbanCategory);
-		kanbanCategory.setProject(null);
-	}
-
+	
 }

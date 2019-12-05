@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.message.request.ProjectRequest;
-import com.example.demo.message.response.ProjectResponse;
-import com.example.demo.message.response.UserProfile;
 import com.example.demo.model.Project;
 import com.example.demo.model.User;
 import com.example.demo.repository.ProjectRepository;
@@ -26,26 +23,10 @@ public class ProjectService {
 	
 	@Autowired
 	private UserRepository userRepository;
-	
-	public List<ProjectResponse> getAllProjects() {
 
-		List<Project> equipments = projectRepository.findAll();
-		List<ProjectResponse> equipmentResponses = equipments
-				.stream()
-				.map(project -> {
-					UserProfile userProfile = new UserProfile(
-							project.getCreator().getUsername(), 
-							project.getCreator().getEmail());
-					return new ProjectResponse(
-							project.getId(), 
-							project.getCreateDateTime(), 
-							project.getName(), 
-							project.getDescription(), 
-							userProfile);
-				}).collect(Collectors.toList());
-		
-		return equipmentResponses;
-	}
+	public List<Project> getAllProjects() {
+		return projectRepository.findAll();
+	}	
 	
 	public Project createProject(ProjectRequest projectRequest) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -54,8 +35,7 @@ public class ProjectService {
 				.orElseThrow(() -> new AppException("User Role not set."));				
 
 		Project project = new Project(projectRequest.getName(), projectRequest.getDescription(), loggedUser);
-		Project response = projectRepository.save(project);
-		return response;
+		return projectRepository.save(project);
 	}
 	
 	public Project updateProject(ProjectRequest projectRequest, Long id) {
