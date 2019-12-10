@@ -16,6 +16,7 @@ import com.example.demo.model.KanbanCategory;
 import com.example.demo.model.Project;
 import com.example.demo.model.Role;
 import com.example.demo.model.RoleName;
+import com.example.demo.model.Settings;
 import com.example.demo.model.User;
 import com.example.demo.repository.CardRepository;
 import com.example.demo.repository.ProjectRepository;
@@ -44,6 +45,9 @@ public class SeedMain {
 	
 	private User admin = new User();
 	private User userAdam = new User();
+	
+	private Settings settingsOne = new Settings();
+	private Settings settingsTwo = new Settings();
 	
 	private Project projectOne = new Project();
 	private Project projectTwo = new Project();
@@ -80,96 +84,92 @@ public class SeedMain {
 	private void seedRolesTable() {
 		List<Role> roles = roleRepository.findAll();
 		
-		if (roles.size() <= 0 || roles == null) {
-			
-			roleAdmin.setName(RoleName.ROLE_ADMIN);
-			roleUser.setName(RoleName.ROLE_USER);
-		
-			roleRepository.saveAll(Arrays.asList(roleAdmin, roleUser));
-		} else {
+		if (roles.size() > 0 || roles != null) {
             logger.info("Users Seeding Not Required");
-        }
+		} 
+		roleAdmin.setName(RoleName.ROLE_ADMIN);
+		roleUser.setName(RoleName.ROLE_USER);
+	
+		roleRepository.saveAll(Arrays.asList(roleAdmin, roleUser));
 	}
 	
 	private void seedUsersTable() {
 		List<User> users = userRepository.findAll();
 		
-		if (users.size() <= 0 || users == null) {	
-						
-			admin.setUsername("admin123");
-			admin.setEmail("admin@demo.com");
-			admin.setPassword(new BCryptPasswordEncoder().encode("admin123"));
-			admin.addRole(roleUser);
-			admin.addRole(roleAdmin);
-			
-			userAdam.setUsername("adam123");
-			userAdam.setEmail("adam@demo.com");
-			userAdam.setPassword(new BCryptPasswordEncoder().encode("adam123"));
-			userAdam.addRole(roleUser);
-						
-			userRepository.saveAll(Arrays.asList(admin, userAdam));
-		} else {
+		if (users.size() > 0 || users != null) {	
             logger.info("Users Seeding Not Required");
-        }
+		} 
+		admin.setUsername("admin123");
+		admin.setEmail("admin@demo.com");
+		admin.setPassword(new BCryptPasswordEncoder().encode("admin123"));
+		admin.addRole(roleUser);
+		admin.addRole(roleAdmin);
+		settingsOne.setUser(admin);
+		admin.setSettings(settingsOne);
+		
+		userAdam.setUsername("adam123");
+		userAdam.setEmail("adam@demo.com");
+		userAdam.setPassword(new BCryptPasswordEncoder().encode("adam123"));
+		userAdam.addRole(roleUser);
+		settingsTwo.setUser(userAdam);
+		userAdam.setSettings(settingsTwo);
+					
+		userRepository.saveAll(Arrays.asList(admin, userAdam));
 	}
 	
 	private void seedProjectsTable() {
 		List<Project> projects = projectRepository.findAll();
 		
-		if (projects.size() <= 0 || projects == null) {
-			
-			projectOne.setName("Project One");
-			projectOne.setDescription("This is Project One");
-			projectOne.setCreator(userAdam);
-			projectOne.addKanbanCategory(categoryTodo);
-			projectOne.addKanbanCategory(categoryInProgress);
-			projectOne.addKanbanCategory(categoryQA);
-			projectOne.addKanbanCategory(categoryDone);
-			
-			projectTwo.setName("Project Two");
-			projectTwo.setDescription("This is Project Two");
-			projectTwo.setCreator(userAdam);
-
-			projectThree.setName("Project Three");
-			projectThree.setDescription("This is Project Three");
-			projectThree.setCreator(userAdam);
-
-			projectFour.setName("Project Four");
-			projectFour.setDescription("This is Project Four");
-			projectFour.setCreator(userAdam);
-
-			projectFive.setName("Project Five");
-			projectFive.setDescription("This is Project Five");
-			projectFive.setCreator(userAdam);
-			
-			projectSix.setName("Project Six");
-			projectSix.setDescription("This is Project Six");
-			projectSix.setCreator(userAdam);
-			
-			projectRepository.saveAll(Arrays.asList(projectOne, projectTwo, projectThree, projectFour, projectFive, projectSix));
-		} else {
+		if (projects.size() > 0 || projects != null) {
 			logger.info("Projects Seeding Not Required");
 		}
+		projectOne.setName("Project One");
+		projectOne.setDescription("This is Project One");
+		projectOne.setCreator(userAdam);
+		projectOne.addKanbanCategory(categoryTodo);
+		projectOne.addKanbanCategory(categoryInProgress);
+		projectOne.addKanbanCategory(categoryQA);
+		projectOne.addKanbanCategory(categoryDone);
+		
+		projectTwo.setName("Project Two");
+		projectTwo.setDescription("This is Project Two");
+		projectTwo.setCreator(userAdam);
+
+		projectThree.setName("Project Three");
+		projectThree.setDescription("This is Project Three");
+		projectThree.setCreator(userAdam);
+
+		projectFour.setName("Project Four");
+		projectFour.setDescription("This is Project Four");
+		projectFour.setCreator(userAdam);
+
+		projectFive.setName("Project Five");
+		projectFive.setDescription("This is Project Five");
+		projectFive.setCreator(userAdam);
+		
+		projectSix.setName("Project Six");
+		projectSix.setDescription("This is Project Six");
+		projectSix.setCreator(userAdam);
+		
+		projectRepository.saveAll(Arrays.asList(projectOne, projectTwo, projectThree, projectFour, projectFive, projectSix));
 	}
 	
 	private void seedCardsTable() {
 		List<Card> cards = cardRepository.findAll();
 		
-		if (cards.size() == 0 || cards == null) {
-			
-			categoryDone.addCard(cardOne);
-			categoryDone.addCard(cardTwo);
-			categoryDone.addCard(cardThree);
-			
-			categoryInProgress.addCard(cardFour);
-			categoryInProgress.addCard(cardFive);
-			
-			categoryQA.addCard(cardSix);
-			categoryQA.addCard(cardSeven);
-			
-			cardRepository.saveAll(Arrays.asList(cardOne, cardTwo, cardThree, cardFour, cardFive, cardSix, cardSeven));
-		} else {
+		if (cards.size() > 0 || cards != null) {
 			logger.info("Cards Seeding Not Required");			
 		}
+		categoryDone.addCard(cardOne);
+		categoryDone.addCard(cardTwo);
+		categoryDone.addCard(cardThree);
+		
+		categoryInProgress.addCard(cardFour);
+		categoryInProgress.addCard(cardFive);
+		
+		categoryQA.addCard(cardSix);
+		categoryQA.addCard(cardSeven);
+		
+		cardRepository.saveAll(Arrays.asList(cardOne, cardTwo, cardThree, cardFour, cardFive, cardSix, cardSeven));
 	}
 }

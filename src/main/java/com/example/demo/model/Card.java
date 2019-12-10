@@ -17,6 +17,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 @Entity
 @DynamicUpdate
@@ -30,11 +31,13 @@ public class Card {
 	@CreationTimestamp
 	private LocalDateTime createDateTime;
 	
-	@Size(min = 5, max = 50)
+	@Size(min = 5, max = 75)
 	private String title;
 	
-	@Size(min = 5, max = 150)	
+	@Size(max = 500)	
 	private String description;
+	
+	private boolean isDone = false;
 	
 	@Min(value = 0)
 	private int position;
@@ -47,6 +50,16 @@ public class Card {
 	@JoinColumn(name = "kanban_category_id")
 	@JsonBackReference
 	private KanbanCategory kanbanCategory;
+	
+	@JsonGetter
+	public String getCardCode() {
+		String cardCode = kanbanCategory.getProject().getName().replaceAll("[AaEeIiOoUu ]", "");
+		String number = String.valueOf(this.getId());
+		cardCode = cardCode.substring(0, 3);
+		cardCode = cardCode.concat("-");
+		cardCode = cardCode.concat(number);
+		return cardCode;
+	}
 	
 	public Card() {}
 
@@ -111,6 +124,14 @@ public class Card {
 
 	public void setKanbanCategory(KanbanCategory kanbanCategory) {
 		this.kanbanCategory = kanbanCategory;
+	}
+
+	public boolean isDone() {
+		return isDone;
+	}
+
+	public void setDone(boolean isDone) {
+		this.isDone = isDone;
 	}
 	
 }

@@ -32,7 +32,7 @@ public class ProjectService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User loggedUser = userRepository
 				.findByUsername(auth.getName())
-				.orElseThrow(() -> new AppException("User Role not set."));				
+				.orElseThrow(() -> new AppException("User Role not set."));
 
 		Project project = new Project(projectRequest.getName(), projectRequest.getDescription(), loggedUser);
 		return projectRepository.save(project);

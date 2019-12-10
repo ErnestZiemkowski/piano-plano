@@ -30,7 +30,6 @@ public class ProjectControllerTest {
 	@Test
 	@WithMockUser("adam123")
 	public void getAllProjectsTest() throws Exception {
-		
 		mockMvc
 			.perform(MockMvcRequestBuilders
 			.get("/api/projects")
@@ -48,26 +47,22 @@ public class ProjectControllerTest {
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].name").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].description").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].creator").exists());
-
 	}
 	
 	@Test
 	@WithMockUser("adam123")
 	public void deleteProjectTest() throws Exception {
-	
 		mockMvc
 			.perform(MockMvcRequestBuilders
 			.delete("/api/projects/{id}", 6)
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.message").value("Project with id of 6 deleted successfully"));
-
 	}
 
 	@Test
 	@WithMockUser("adam123")
 	public void createProjectTest() throws Exception {
-	
 		Gson gson = new Gson();
 		ProjectRequest project = new ProjectRequest("Project Test", "This is test description");
 		String jsonProject = gson.toJson(project);
@@ -81,13 +76,11 @@ public class ProjectControllerTest {
 			.andExpect(status().isOk())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.name").value("Project Test"))
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.description").value("This is test description"));
-		
 	}
 
 	@Test
 	@WithMockUser("adam123")
 	public void updateUserTest() throws Exception {
-		
 		Gson gson = new Gson();
 		ProjectRequest project = new ProjectRequest(null, "This is updated description");
 		String jsonProject = gson.toJson(project);
@@ -100,6 +93,5 @@ public class ProjectControllerTest {
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.description").value("This is updated description"));
-		
 	}	
 }

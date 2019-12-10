@@ -42,7 +42,6 @@ public class CardControllerTest {
 	@Test
 	@WithMockUser("adam123")
 	public void createCardTest() throws Exception {
-		
 		Gson gson = new Gson();
 		CardRequest card = new CardRequest(null, "Test Card title", "Test Card description", 1, (long) 1);
 		String jsonCard = gson.toJson(card);
@@ -63,7 +62,6 @@ public class CardControllerTest {
 	@Test
 	@WithMockUser("adam123")
 	public void updateCardTest() throws Exception {
-		
 		Gson gson = new Gson();
 		CardRequest card = new CardRequest(null, "Test Card UPDATED", "Test Card UPDATED", 1, (long) 1);
 		String jsonCard = gson.toJson(card);
@@ -80,5 +78,4 @@ public class CardControllerTest {
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.title").value("Test Card UPDATED"))
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.description").value("Test Card UPDATED"));
 	}
-	
 }

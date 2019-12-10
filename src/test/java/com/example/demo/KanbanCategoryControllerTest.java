@@ -31,7 +31,6 @@ public class KanbanCategoryControllerTest {
 	@Test
 	@WithMockUser("adam123")
 	public void getAllProjectKanbanCategoriesTest() throws Exception {
-		
 		mockMvc
 			.perform(MockMvcRequestBuilders
 			.get("/api/projects/{projectId}/kanban-categories", 1)
@@ -45,7 +44,6 @@ public class KanbanCategoryControllerTest {
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[2].title").value("Q&A"))
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[3].id").exists())
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[3].title").value("Done"));
-
 	}
 	
 	@Test
@@ -65,7 +63,7 @@ public class KanbanCategoryControllerTest {
 		Gson gson = new Gson();
 		KanbanCategoryRequest kanbanCategory = new KanbanCategoryRequest(null, "Kanban Category Test", (long) 1, 0, null, null);
 		String jsonKanbanCategory = gson.toJson(kanbanCategory);
-	
+
 		mockMvc
 			.perform(MockMvcRequestBuilders
 			.post("/api/kanban-category")
@@ -123,5 +121,4 @@ public class KanbanCategoryControllerTest {
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[3].title").value("InProgress"))
 			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$[3].position").value("3"));
 	}
-	
 }

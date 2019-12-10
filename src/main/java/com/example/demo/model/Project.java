@@ -33,7 +33,7 @@ public class Project {
 	@CreationTimestamp
 	private LocalDateTime createDateTime;
 	
-	@Size(min = 5, max = 100)
+	@Size(min = 5, max = 75)
 	private String name;
 	
 	@Size(max = 500)
@@ -112,5 +112,5 @@ public class Project {
 		this.kanbanCategories.remove(kanbanCategory);
 		kanbanCategory.setProject(null);
 	}
-
+	
 }
