@@ -36,9 +36,10 @@ public class KanbanCategoryService {
 		Project project = projectRepository.findById(kanbanCategoryRequest.getProjectId())
 				.orElseThrow(() -> new ResourceNotFoundException("Project", "id", kanbanCategoryRequest.getProjectId()));		
 		
-		KanbanCategory kanbanCategory = new KanbanCategory();
-		kanbanCategory.setProject(project);
-		kanbanCategory.setTitle(kanbanCategoryRequest.getTitle());
+		KanbanCategory kanbanCategory = KanbanCategory.createKanbanCategory(
+				kanbanCategoryRequest.getTitle(), 
+				kanbanCategoryRequest.getPosition(),
+				project);
 		
 		return kanbanCategoryRepository.save(kanbanCategory);
 	}

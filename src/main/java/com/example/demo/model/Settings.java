@@ -28,10 +28,27 @@ public class Settings {
 	
 	public Settings() {}
 
-	public Settings(User user) {
+	private Settings(User user) {
 		this.user = user;
 	}
 
+	private Settings(User user, String backgroundImageUrl) {
+		this.user = user;
+		this.backgroundImageUrl = backgroundImageUrl;
+	}
+	
+	public static Settings createSettings() {
+		return new Settings();
+	}
+
+	public static Settings createSettings(User user) {
+		return new Settings(user);
+	}
+
+	public static Settings createSettings(User user, String backgroundImageUrl) {
+		return new Settings(user, backgroundImageUrl);
+	}
+	
 	public Long getId() {
 		return id;
 	}

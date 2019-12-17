@@ -34,7 +34,12 @@ public class ProjectService {
 				.findByUsername(auth.getName())
 				.orElseThrow(() -> new AppException("User Role not set."));
 
-		Project project = new Project(projectRequest.getName(), projectRequest.getDescription(), loggedUser);
+		Project project = Project.builder()
+				.name(projectRequest.getName())
+				.description(projectRequest.getDescription())
+				.creator(loggedUser)
+				.build();
+		
 		return projectRepository.save(project);
 	}
 	

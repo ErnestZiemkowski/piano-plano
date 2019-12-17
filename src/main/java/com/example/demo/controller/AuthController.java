@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.Collections;
 
 import javax.validation.Valid;
 
@@ -92,12 +91,17 @@ public class AuthController {
     	return new ResponseEntity<>(new ResponseMessage("Fail -> Email is already in use!"),
 		HttpStatus.BAD_REQUEST);
     }
- 
-    User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));	 
+
     Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
     		.orElseThrow(() -> new AppException("User Role not set."));
+
+    User user = User.builder()
+    		.username(signUpRequest.getUsername())
+    		.email(signUpRequest.getEmail())
+    		.password(passwordEncoder.encode(signUpRequest.getPassword()))
+    		.addRole(userRole)
+    		.build();
     
-    user.setRoles(Collections.singleton(userRole));
     userRepository.save(user);
  
     return new ResponseEntity<>(new ResponseMessage("User registered successfully!"), HttpStatus.OK);

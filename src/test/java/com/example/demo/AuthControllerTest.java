@@ -1,57 +1,96 @@
 package com.example.demo;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 
 import com.example.demo.message.request.LoginForm;
 import com.example.demo.message.request.SignUpForm;
+import com.example.demo.model.Role;
+import com.example.demo.model.RoleName;
+import com.example.demo.model.User;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
 import com.google.gson.Gson;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class AuthControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 	
+	@Autowired
+	private UserRepository userRepository;  
+	
+	@Autowired
+	private RoleRepository roleRepository;
+	
+	private static boolean initialized = false;
+
+	@Before
+	public void init() {
+		if (!initialized) {
+			// given
+			Role roleUser = Role.createRole(RoleName.ROLE_USER);
+			User user = User.builder()
+					.username("admin123")
+					.password(new BCryptPasswordEncoder().encode("admin123"))
+					.addRole(roleUser)
+					.email("admin123@demo.com")
+					.build();
+
+			roleRepository.save(roleUser);
+			userRepository.save(user);
+			initialized = true;
+		}
+	}
+	
 	@Test
 	public void signInValidUserTest() throws Exception {		
+		// given
 		Gson gson  = new Gson();
-		LoginForm loginRequest = new LoginForm("admin123", "admin123");
+		LoginForm loginRequest = LoginForm.createLoginForm("admin123", "admin123");
 		String jsonUser = gson.toJson(loginRequest);
 		
+		// when + then		
 		mockMvc
-			.perform(MockMvcRequestBuilders
-			.post("/api/auth/signin")
+			.perform(post("/api/auth/signin")
 			.content(jsonUser)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.token").isNotEmpty())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.type").value("Bearer"));		
+			.andExpect(jsonPath("$.token").isNotEmpty())
+			.andExpect(jsonPath("$.type").value("Bearer"));		
 	}
 	
 	@Test
 	public void signInAuthorizedUserInvalidPasswordTest() throws Exception {
+		// given
 		Gson gson = new Gson();
-		LoginForm loginRequest = new LoginForm("adam", "badpassword");
+		LoginForm loginRequest = LoginForm.createLoginForm("adam", "badpassword");
 		String jsonUser = gson.toJson(loginRequest);
 		
+		// when + then
 		mockMvc
-			.perform(MockMvcRequestBuilders
-			.post("/api/auth/signin")
+			.perform(post("/api/auth/signin")
 			.content(jsonUser)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
@@ -60,13 +99,14 @@ public class AuthControllerTest {
 	
 	@Test
 	public void signInUnauthenticatedUserInvalidPasswordTest() throws Exception {
+		// given
 		Gson gson = new Gson();
-		LoginForm loginRequest = new LoginForm("nonexistinguser", "badpassword");
+		LoginForm loginRequest = LoginForm.createLoginForm("nonexistinguser", "badpassword");
 		String jsonUser = gson.toJson(loginRequest);
 		
+		// when + then
 		mockMvc
-			.perform(MockMvcRequestBuilders
-			.post("/api/auth/signin")
+			.perform(post("/api/auth/signin")
 			.content(jsonUser)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
@@ -75,45 +115,47 @@ public class AuthControllerTest {
 	
 	@Test 
 	public void signUpNonExistingUserTest() throws Exception {
+		// given
 		Gson gson = new Gson();
-		SignUpForm registerRequest = new SignUpForm("nonexistinguser", "nonexistinguser@demo.com", "nonexistinguser");
+		SignUpForm registerRequest = SignUpForm.createSignUpForm("nonexistinguser", "nonexistinguser@demo.com", "nonexistinguser");
 		String jsonUser = gson.toJson(registerRequest);
 
+		// when + then
 		mockMvc
-			.perform(MockMvcRequestBuilders
-			.post("/api/auth/signup")
+			.perform(post("/api/auth/signup")
 			.content(jsonUser)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("User registered successfully!"));
+			.andExpect(jsonPath("$.message").value("User registered successfully!"));
 	}
 
 	@Test 
 	public void signUpExistingUserTest() throws Exception {
+		// given
 		Gson gson = new Gson();
-		SignUpForm registerRequest = new SignUpForm("adam123", "adam@demo.com", "adam123");
+		SignUpForm registerRequest = SignUpForm.createSignUpForm("admin123", "admin123@demo.com", "admin123");
 		String jsonUser = gson.toJson(registerRequest);
 
+		// when + then
 		mockMvc
-			.perform(MockMvcRequestBuilders
-			.post("/api/auth/signup")
+			.perform(post("/api/auth/signup")
 			.content(jsonUser)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Fail -> Username is already taken!"));
+			.andExpect(jsonPath("$.message").value("Fail -> Username is already taken!"));
 	}
 	
 	@Test
-	@WithMockUser("adam123")
+	@WithMockUser("admin123")
 	public void getCurrentLoggedInUserTest() throws Exception {
+		// when + then
 		mockMvc
-			.perform(MockMvcRequestBuilders
-			.get("/api/auth/user/me")
+			.perform(get("/api/auth/user/me")
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.username").value("adam123"))
-			.andExpect((ResultMatcher) MockMvcResultMatchers.jsonPath("$.email").value("adam@demo.com"));
+			.andExpect(jsonPath("$.username").value("admin123"))
+			.andExpect(jsonPath("$.email").value("admin123@demo.com"));
 	}
 }

@@ -26,8 +26,12 @@ public class Role {
 	
 	public Role() {}
 
-	public Role(RoleName name) {
+	private Role(RoleName name) {
 		this.name = name;
+	}
+	
+	public static Role createRole(RoleName name) {
+		return new Role(name);
 	}
 
 	public Long getId() {

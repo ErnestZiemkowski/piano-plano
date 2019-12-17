@@ -11,8 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -39,7 +39,10 @@ public class Project {
 	@Size(max = 500)
 	private String description;
 	
-	@OneToOne
+	@ManyToOne(cascade = {
+		CascadeType.PERSIST,
+		CascadeType.MERGE
+	})
 	@JoinColumn(name = "user_id")
 	private User creator;
 
@@ -49,16 +52,60 @@ public class Project {
 		cascade = CascadeType.ALL, 
 		orphanRemoval = true)
 	@JsonManagedReference
-	private List<KanbanCategory> kanbanCategories = new ArrayList<>();
+	private List<KanbanCategory> kanbanCategories;
 	
 	public Project() {}
+	
+	public static final class Builder {
+		private String name;
+		private String description;
+		private User creator;
+		private List<KanbanCategory> kanbanCategories = new ArrayList<>();
+		
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder description(String description) {
+			this.description = description;
+			return this;
+		}
+		
+		public Builder creator(User creator) {
+			this.creator = creator;
+			return this;
+		}
+		
+		public Builder addKanbanCategory(KanbanCategory kanbanCategory) {
+			this.kanbanCategories.add(kanbanCategory);
+			return this;
+		}
+		
+		public Project build() {
+			if (name.isEmpty()) {
+				throw new IllegalStateException("Title cannot be empty");
+			}
+			
+			if (creator == null) {
+				throw new IllegalStateException("Creator cannot be empty");
+			}
 
-	public Project(String name, String description, User creator) {
-		this.name = name;
-		this.description = description;
-		this.creator = creator;
+			Project project = new Project();
+			project.name = this.name;
+			project.description = this.description;
+			project.creator = this.creator;
+			this.creator.addProject(project);
+			project.kanbanCategories = this.kanbanCategories;
+			return project;
+		}
+		
 	}
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public Long getId() {
 		return id;
 	}

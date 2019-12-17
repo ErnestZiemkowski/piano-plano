@@ -35,7 +35,7 @@ public class KanbanCategory {
 	private String title;
 	
 	@Min(value = 0)
-	private int position;
+	private Integer position;
 
 	@OneToMany(
 		fetch = FetchType.EAGER,
@@ -45,18 +45,32 @@ public class KanbanCategory {
 	@JsonManagedReference
 	private List<Card> cards = new ArrayList<>();
 	
-	@ManyToOne()
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "project_id")
 	@JsonBackReference
 	private Project project;
 	
 	public KanbanCategory() {}
 
-	public KanbanCategory(String title, int position) {
+	private KanbanCategory(String title, Integer position) {
 		this.title = title;
 		this.position = position;
 	}
 
+	private KanbanCategory(String title, Integer position, Project project) {
+		this.title = title;
+		this.position = position;
+		this.project = project;
+	}
+
+	public static KanbanCategory createKanbanCategory(String title, Integer position) {
+		return new KanbanCategory(title, position);
+	}
+
+	public static KanbanCategory createKanbanCategory(String title, Integer position, Project project) {
+		return new KanbanCategory(title, position, project);
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -77,7 +91,7 @@ public class KanbanCategory {
 		return position;
 	}
 
-	public void setPosition(int position) {
+	public void setPosition(Integer position) {
 		this.position = position;
 	}
 

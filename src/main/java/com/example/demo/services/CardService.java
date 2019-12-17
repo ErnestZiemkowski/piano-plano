@@ -52,12 +52,13 @@ public class CardService {
 				
 		int cardsInKanbanCategory = kanbanCategory.getCards().size();
 		
-		Card card = new Card();
-		card.setTitle(cardRequest.getTitle());
-		card.setDescription(cardRequest.getDescription());
-		card.setPosition(cardsInKanbanCategory + 1);
-		card.setCreator(loggedUser);
-		card.setKanbanCategory(kanbanCategory);
+		Card card = Card.builder()
+				.title(cardRequest.getTitle())
+				.description(cardRequest.getDescription())
+				.position(cardsInKanbanCategory + 1)
+				.creator(loggedUser)
+				.kanbanCategory(kanbanCategory)
+				.build();
 		
 		return cardRepository.save(card);
 	}

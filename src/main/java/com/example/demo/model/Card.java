@@ -37,7 +37,7 @@ public class Card {
 	@Size(max = 500)	
 	private String description;
 	
-	private boolean isDone = false;
+	private boolean isDone;
 	
 	@Min(value = 0)
 	private int position;
@@ -50,26 +50,76 @@ public class Card {
 	@JoinColumn(name = "kanban_category_id")
 	@JsonBackReference
 	private KanbanCategory kanbanCategory;
-	
-	@JsonGetter
-	public String getCardCode() {
-		String cardCode = kanbanCategory.getProject().getName().replaceAll("[AaEeIiOoUu ]", "");
-		String number = String.valueOf(this.getId());
-		cardCode = cardCode.substring(0, 3);
-		cardCode = cardCode.concat("-");
-		cardCode = cardCode.concat(number);
-		return cardCode;
-	}
-	
+		
 	public Card() {}
 
-	public Card(String title, String description, int position, User creator) {
-		this.title = title;
-		this.description = description;
-		this.position = position;
-		this.creator = creator;
-	}
+	public static final class Builder {
+		private String title;
+		private String description;
+		private boolean isDone = false;
+		private Integer position;
+		private User creator;
+		private KanbanCategory kanbanCategory;
+		
+		public Builder title(String name) {
+			this.title = name;
+			return this;
+		}
+		
+		public Builder description(String description) {
+			this.description = description;
+			return this;
+		}
+		
+		public Builder isDone() {
+			this.isDone = true;
+			return this;
+		}
+		
+		public Builder position(Integer position) {
+			this.position = position;
+			return this;
+		}
+		
+		public Builder creator(User creator) {
+			this.creator = creator;
+			return this;
+		}
+		
+		public Builder kanbanCategory(KanbanCategory kanbanCategory) {
+			this.kanbanCategory = kanbanCategory;
+			return this;
+		}
+		
+		public Card build() {
+			if (title.isEmpty()) {
+				throw new IllegalStateException("Title cannot be empty");
+			}
 
+			if (position.equals(null)) {
+				throw new IllegalStateException("Password cannot be empty");
+			}
+			
+			if (kanbanCategory.equals(null)) {
+				throw new IllegalStateException("Kanban Category cannot be empty");
+			}
+
+			Card card = new Card();
+			card.title = this.title;
+			card.description = this.description;
+			card.isDone = this.isDone;
+			card.position = this.position;
+			card.creator = this.creator;
+			kanbanCategory.addCard(card);
+			card.kanbanCategory = this.kanbanCategory;
+			return card;
+		}
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -102,6 +152,14 @@ public class Card {
 		this.description = description;
 	}
 	
+	public boolean isDone() {
+		return isDone;
+	}
+
+	public void setDone(boolean isDone) {
+		this.isDone = isDone;
+	}
+
 	public void setPosition(int position) {
 		this.position = position;
 	}
@@ -125,13 +183,14 @@ public class Card {
 	public void setKanbanCategory(KanbanCategory kanbanCategory) {
 		this.kanbanCategory = kanbanCategory;
 	}
-
-	public boolean isDone() {
-		return isDone;
-	}
-
-	public void setDone(boolean isDone) {
-		this.isDone = isDone;
-	}
 	
+	@JsonGetter
+	public String getCardCode() {
+		String cardCode = kanbanCategory.getProject().getName().replaceAll("[AaEeIiOoUu ]", "");
+		String number = String.valueOf(this.getId());
+		cardCode = cardCode.substring(0, 3);
+		cardCode = cardCode.concat("-");
+		cardCode = cardCode.concat(number);
+		return cardCode;
+	}
 }
