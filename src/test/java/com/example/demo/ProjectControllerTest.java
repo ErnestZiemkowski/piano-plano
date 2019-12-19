@@ -59,33 +59,41 @@ public class ProjectControllerTest {
 		if (!initialized) {
 			// given
 			Role roleUser = Role.createRole(RoleName.ROLE_USER);
-			User user = User.builder()
+			User adam = User.builder()
 					.username("adam123")
 					.password(new BCryptPasswordEncoder().encode("adam123"))
 					.addRole(roleUser)
 					.email("adam123@demo.com")
 					.build();
 			
+			User eve = User.builder()
+					.username("eve69")
+					.password(new BCryptPasswordEncoder().encode("eve$69"))
+					.addRole(roleUser)
+					.email("eve69@demo.com")
+					.build();
+					
 			Project projectOne = Project.builder()
 					.name("Project test one")
 					.description("test")
-					.creator(user)
+					.creator(adam)
 					.build();
 
 			Project projectTwo = Project.builder()
 					.name("Project test two")
 					.description("test")
-					.creator(user)
+					.creator(eve)
 					.build();
 
 			Project projectThree = Project.builder()
-					.name("Project test two")
+					.name("Project test three")
 					.description("test")
-					.creator(user)
+					.creator(eve)
+					.addMember(adam)
 					.build();
 
 			roleRepository.save(roleUser);
-			userRepository.save(user);
+			userRepository.saveAll(Arrays.asList(adam, eve));
 			projectRepository.saveAll(Arrays.asList(projectOne, projectTwo, projectThree));		
 			initialized = true;
 		}
@@ -99,10 +107,10 @@ public class ProjectControllerTest {
 			.perform(get("/api/projects")
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].name").exists())
+			.andExpect(jsonPath("$[0].name").value("Project test one"))
 			.andExpect(jsonPath("$[0].description").exists())
 			.andExpect(jsonPath("$[0].creator").exists())
-			.andExpect(jsonPath("$[1].name").exists())
+			.andExpect(jsonPath("$[1].name").value("Project Create Test"))
 			.andExpect(jsonPath("$[1].description").exists())
 			.andExpect(jsonPath("$[1].creator").exists());
 	}

@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -23,9 +24,22 @@ public class ProjectService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	public static <T> Set<T> mergeSet(Set<T> a, Set<T> b) {
+		Set<T> mergeSet = new HashSet<T>();
+		mergeSet.addAll(a);
+		mergeSet.addAll(b);
+		
+		return mergeSet;
+	}
 
-	public List<Project> getAllProjects() {
-		return projectRepository.findAll();
+	public Set<Project> getProjectsOfLoggedUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User loggedUser = userRepository
+				.findByUsername(auth.getName())
+				.orElseThrow(() -> new AppException("User Role not set."));
+		
+		return mergeSet(loggedUser.getCreatedProjects(), loggedUser.getParticipatingProjects());
 	}	
 	
 	public Project createProject(ProjectRequest projectRequest) {

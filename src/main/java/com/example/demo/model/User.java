@@ -81,8 +81,13 @@ public class User {
 			CascadeType.MERGE,
 			CascadeType.DETACH
 		})
-	private Set<Project> projects;
+	@JsonBackReference
+	private Set<Project> createdProjects;
 		
+	@ManyToMany(mappedBy = "members")
+	@JsonBackReference
+	private Set<Project> participatingProjects;
+	
 	public User() {}
 	
 	public static final class Builder {
@@ -91,7 +96,8 @@ public class User {
 		private String password;
 		private Set<Role> roles = new HashSet<>();
 		private Settings settings = new Settings();
-		private Set<Project> projects = new HashSet<>();
+		private Set<Project> createdProjects = new HashSet<>();
+		private Set<Project> participatingProjects = new HashSet<>();
 		
 		public Builder username(String username) {
 			this.username = username;
@@ -113,10 +119,15 @@ public class User {
 			return this;
 		}
 				
-		public Builder addProject(Project project) {
-			this.projects.add(project);
+		public Builder addCreatedProject(Project project) {
+			this.createdProjects.add(project);
 			return this;
 		}
+		
+		public Builder addParticipatingProject(Project project) {
+			this.participatingProjects.add(project);
+			return this;
+		}		
 		
 		public User build() {
 			if(username.isEmpty()) {
@@ -138,7 +149,7 @@ public class User {
 			user.roles = this.roles;
 			this.settings.setUser(user);
 			user.settings = this.settings;
-			user.projects = this.projects;
+			user.createdProjects = this.createdProjects;
 			return user;
 		}
 	}
@@ -204,13 +215,21 @@ public class User {
 		settings.setUser(this);
 	}
 	
-	public void addProject(Project project) {
-		this.projects.add(project);
+	public void addCreatedProject(Project project) {
+		this.createdProjects.add(project);
 		project.setCreator(this);
 	}
 	
-	public void removeProject(Project project) {
-		this.projects.remove(project);
+	public void removeCreatedProject(Project project) {
+		this.createdProjects.remove(project);
 		project.setCreator(null);
 	}
+
+	public Set<Project> getCreatedProjects() {
+		return createdProjects;
+	}
+
+	public Set<Project> getParticipatingProjects() {
+		return participatingProjects;
+	}	
 }

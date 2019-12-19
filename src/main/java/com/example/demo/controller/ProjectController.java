@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -31,8 +31,8 @@ public class ProjectController {
 
 	@GetMapping()
 	@PreAuthorize("hasRole('USER')")
-	public List<Project> getProjects() {
-		return projectService.getAllProjects();
+	public Set<Project> getProjects() {
+		return projectService.getProjectsOfLoggedUser();
 	}	
 	
 	@PostMapping()

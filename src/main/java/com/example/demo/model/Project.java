@@ -2,7 +2,9 @@ package com.example.demo.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -11,6 +13,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -44,8 +48,19 @@ public class Project {
 		CascadeType.MERGE
 	})
 	@JoinColumn(name = "user_id")
+	@JsonManagedReference
 	private User creator;
 
+	@ManyToMany(cascade = {
+			CascadeType.PERSIST,
+			CascadeType.MERGE})
+	@JoinTable(
+		name = "project_members",
+		joinColumns = @JoinColumn(name = "project_id"),
+		inverseJoinColumns = @JoinColumn(name = "user_id"))
+	@JsonManagedReference
+	private Set<User> members;
+	
 	@OneToMany(
 		fetch = FetchType.EAGER,
 		mappedBy = "project", 
@@ -61,6 +76,7 @@ public class Project {
 		private String description;
 		private User creator;
 		private List<KanbanCategory> kanbanCategories = new ArrayList<>();
+		private Set<User> members = new HashSet<>();
 		
 		public Builder name(String name) {
 			this.name = name;
@@ -82,6 +98,11 @@ public class Project {
 			return this;
 		}
 		
+		public Builder addMember(User member) {
+			this.members.add(member);
+			return this;
+		}
+		
 		public Project build() {
 			if (name.isEmpty()) {
 				throw new IllegalStateException("Title cannot be empty");
@@ -95,8 +116,9 @@ public class Project {
 			project.name = this.name;
 			project.description = this.description;
 			project.creator = this.creator;
-			this.creator.addProject(project);
+			this.creator.addCreatedProject(project);
 			project.kanbanCategories = this.kanbanCategories;
+			project.members = this.members;
 			return project;
 		}
 		
@@ -160,4 +182,14 @@ public class Project {
 		kanbanCategory.setProject(null);
 	}
 	
+	public void addMember(User member) {
+		this.members.add(member);
+		member.addCreatedProject(this);
+	}
+
+	public void removeMember(User member) {
+		this.members.remove(member);
+		member.addCreatedProject(null);
+	}
+
 }
