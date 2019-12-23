@@ -67,8 +67,7 @@ public class User {
 	@OneToOne(
 		mappedBy = "user",
 		cascade = CascadeType.ALL,
-		fetch = FetchType.EAGER,
-		optional = false
+		fetch = FetchType.EAGER
 	)
 	@JsonBackReference
 	private Settings settings;

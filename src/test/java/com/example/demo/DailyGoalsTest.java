@@ -1,12 +1,8 @@
 package com.example.demo;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-
-import java.util.Arrays;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +18,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.example.demo.message.request.CardRequest;
+import com.example.demo.message.request.DailyGoalRequest;
 import com.example.demo.model.Card;
 import com.example.demo.model.KanbanCategory;
 import com.example.demo.model.Project;
@@ -40,11 +36,11 @@ import com.google.gson.Gson;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-public class CardControllerTest {
+public class DailyGoalsTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-
+		
 	@Autowired
 	private ProjectRepository projectRepository;
 
@@ -59,7 +55,7 @@ public class CardControllerTest {
 
 	@Autowired
 	private CardRepository cardRepository;
-	
+
 	private static boolean initialized = false;
 
 	@Before
@@ -75,21 +71,15 @@ public class CardControllerTest {
 					.build();
 
 			KanbanCategory categoryToDo = KanbanCategory.createKanbanCategory("To Do", 1);
-			KanbanCategory categoryInProgress = KanbanCategory.createKanbanCategory("In Progress", 2);
-			KanbanCategory categoryDone = KanbanCategory.createKanbanCategory("Done", 3);
 
 			Project projectOne = Project.builder()
 					.name("Project test one")
 					.description("test")
 					.creator(user)
 					.addKanbanCategory(categoryToDo)
-					.addKanbanCategory(categoryInProgress)
-					.addKanbanCategory(categoryDone)
 					.build();
 
 			categoryToDo.setProject(projectOne);
-			categoryInProgress.setProject(projectOne);
-			categoryDone.setProject(projectOne);
 			
 			Card cardOne = Card.builder()
 					.creator(user)
@@ -98,20 +88,11 @@ public class CardControllerTest {
 					.position(0)
 					.kanbanCategory(categoryToDo)
 					.build();
-
-			Card cardTwo = Card.builder()
-					.creator(user)
-					.title("Card Two")
-					.description("Card two description")
-					.position(1)
-					.kanbanCategory(categoryToDo)
-					.build();
-
 			
 			roleRepository.save(roleUser);
 			userRepository.save(user);
-			kanbanCategoryRepository.saveAll(Arrays.asList(categoryToDo, categoryInProgress, categoryDone));
-			cardRepository.saveAll(Arrays.asList(cardOne, cardTwo));
+			kanbanCategoryRepository.save(categoryToDo);
+			cardRepository.save(cardOne);
 			projectRepository.save(projectOne);
 			initialized = true;
 		}
@@ -119,66 +100,36 @@ public class CardControllerTest {
 	
 	@Test
 	@WithMockUser("adam123")
-	public void deleteCardTest() throws Exception {
+	public void getActiveDailyGoalsTest() throws Exception {
+		// when + then
 		mockMvc
-			.perform(delete("/api/cards/{id}", 2)
+			.perform(get("/api/daily-goals")
 			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.message").value("Card with id of 2 deleted successfully"));
+			.andExpect(status().is4xxClientError());
 	}
 
-	
 	@Test
 	@WithMockUser("adam123")
-	public void createCardTest() throws Exception {
+	public void toggleSettingCardAsDailyGoal() throws Exception {
 		// given
 		Gson gson = new Gson();
-		CardRequest card = CardRequest.builder()
-				.title("Test Card title")
-				.description("Test Card description")
-				.position(1)
-				.projectId((long) 1)
-				.build();
-				
-		String jsonCard = gson.toJson(card);
+		DailyGoalRequest request = new DailyGoalRequest();
+		request.setCardId((long) 1);
+		String jsonDailyGoal = gson.toJson(request);
 		
 		// when + then
 		mockMvc
-			.perform(post("/api/cards")
-			.content(jsonCard)
+			.perform(post("/api/daily-goals")
+			.content(jsonDailyGoal)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.createDateTime").exists())
-			.andExpect(jsonPath("$.title").value("Test Card title"))
-			.andExpect(jsonPath("$.description").value("Test Card description"));
-	}
-	
-	@Test
-	@WithMockUser("adam123")
-	public void updateCardTest() throws Exception {
-		// given
-		Gson gson = new Gson();
-		CardRequest card = CardRequest.builder()
-				.title("Test Card UPDATED")
-				.description("Test Card UPDATED")
-				.position(1)
-				.projectId((long) 1)
-				.build();
-
-		String jsonCard = gson.toJson(card);
-
-		// when + then
-		mockMvc
-			.perform(put("/api/cards/{id}", 1)
-			.content(jsonCard)
-			.contentType(MediaType.APPLICATION_JSON)
-			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.createDateTime").exists())
-			.andExpect(jsonPath("$.title").value("Test Card UPDATED"))
-			.andExpect(jsonPath("$.description").value("Test Card UPDATED"));
+			.andExpect(status().isOk());
+		
+//		mockMvc
+//			.perform(post("/api/daily-goals")
+//			.content(jsonDailyGoal)
+//			.contentType(MediaType.APPLICATION_JSON)
+//			.accept(MediaType.APPLICATION_JSON))
+//			.andExpect(status().isOk());
 	}
 }

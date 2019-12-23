@@ -2,7 +2,9 @@ package com.example.demo.model;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,6 +17,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -29,12 +32,15 @@ public class Card {
 	private Long id;
 	
 	@CreationTimestamp
-	private LocalDateTime createDateTime;
+	private LocalDateTime createdAt;
 	
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
+ 	
 	@Size(min = 5, max = 75)
 	private String title;
 	
-	@Size(max = 500)	
+  	@Size(max = 500)	
 	private String description;
 	
 	private boolean isDone;
@@ -50,7 +56,15 @@ public class Card {
 	@JoinColumn(name = "kanban_category_id")
 	@JsonBackReference
 	private KanbanCategory kanbanCategory;
-		
+	
+	@OneToOne(
+		mappedBy = "card",
+		cascade = CascadeType.ALL,
+		fetch = FetchType.EAGER
+	)
+	@JsonBackReference
+	private DailyGoal dailyGoal;
+	
 	public Card() {}
 
 	public static final class Builder {
@@ -128,14 +142,22 @@ public class Card {
 		this.id = id;
 	}
 
-	public LocalDateTime getCreateDateTime() {
-		return createDateTime;
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCreateDateTime(LocalDateTime createDateTime) {
-		this.createDateTime = createDateTime;
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
-	
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -184,6 +206,14 @@ public class Card {
 		this.kanbanCategory = kanbanCategory;
 	}
 	
+	public DailyGoal getDailyGoal() {
+		return dailyGoal;
+	}
+
+	public void setDailyGoal(DailyGoal dailyGoal) {
+		this.dailyGoal = dailyGoal;
+	}
+
 	@JsonGetter
 	public String getCardCode() {
 		String cardCode = kanbanCategory.getProject().getName().replaceAll("[AaEeIiOoUu ]", "");
@@ -191,6 +221,12 @@ public class Card {
 		cardCode = cardCode.substring(0, 3);
 		cardCode = cardCode.concat("-");
 		cardCode = cardCode.concat(number);
+		cardCode = cardCode.toLowerCase();
 		return cardCode;
+	}
+	
+	@JsonGetter
+	public boolean isDailyGoalSet() {
+		return this.dailyGoal != null ? true : false;
 	}
 }
