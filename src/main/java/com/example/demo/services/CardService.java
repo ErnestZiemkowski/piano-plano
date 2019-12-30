@@ -13,6 +13,7 @@ import com.example.demo.model.KanbanCategory;
 import com.example.demo.model.Project;
 import com.example.demo.model.User;
 import com.example.demo.repository.CardRepository;
+import com.example.demo.repository.KanbanCategoryRepository;
 import com.example.demo.repository.ProjectRepository;
 import com.example.demo.repository.UserRepository;
 
@@ -27,6 +28,9 @@ public class CardService {
 	
 	@Autowired
 	private ProjectRepository projectRepository;
+	
+	@Autowired
+	private KanbanCategoryRepository kanbanCategoryRepository;
 	
 	public void deleteCardById(Long id) {
 		Card card = cardRepository
@@ -70,7 +74,14 @@ public class CardService {
 
 		if (cardRequest.getTitle() != null) card.setTitle(cardRequest.getTitle());
 		if (cardRequest.getDescription() != null) card.setDescription(cardRequest.getDescription());
-			
+		if (cardRequest.getKanbanCategoryId() != null) {
+			KanbanCategory kanbanCategory = kanbanCategoryRepository
+					.findById(cardRequest.getKanbanCategoryId())
+					.orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardRequest.getKanbanCategoryId()));
+	
+			card.setKanbanCategory(kanbanCategory);
+		}
+		
 		return cardRepository.save(card);
 	}
 	

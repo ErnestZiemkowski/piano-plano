@@ -12,6 +12,8 @@ public class CardRequest {
 	private boolean isDone;
 	
 	private int kanbanCategoryPosition;
+	
+	private Long kanbanCategoryId;
 
 	private Long projectId;
 		
@@ -122,4 +124,13 @@ public class CardRequest {
 	public void setProjectId(Long projectId) {
 		this.projectId = projectId;
 	}
+
+	public Long getKanbanCategoryId() {
+		return kanbanCategoryId;
+	}
+
+	public void setKanbanCategoryId(Long kanbanCategoryId) {
+		this.kanbanCategoryId = kanbanCategoryId;
+	}
+
 }

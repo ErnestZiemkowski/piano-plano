@@ -69,6 +69,12 @@ public class Project {
 	@JsonManagedReference
 	private List<KanbanCategory> kanbanCategories;
 	
+	@OneToMany(
+		fetch = FetchType.EAGER,
+		cascade = CascadeType.ALL,
+		orphanRemoval = true)
+	private Set<Comment> comments;
+
 	public Project() {}
 	
 	public static final class Builder {
@@ -77,6 +83,7 @@ public class Project {
 		private User creator;
 		private List<KanbanCategory> kanbanCategories = new ArrayList<>();
 		private Set<User> members = new HashSet<>();
+		private Set<Comment> comments = new HashSet<>();
 		
 		public Builder name(String name) {
 			this.name = name;
@@ -103,6 +110,11 @@ public class Project {
 			return this;
 		}
 		
+		public Builder addComment(Comment comment) {
+			this.comments.add(comment);
+			return this;
+		}
+
 		public Project build() {
 			if (name.isEmpty()) {
 				throw new IllegalStateException("Title cannot be empty");
@@ -119,6 +131,7 @@ public class Project {
 			this.creator.addCreatedProject(project);
 			project.kanbanCategories = this.kanbanCategories;
 			project.members = this.members;
+			project.comments = this.comments;
 			return project;
 		}
 		
@@ -190,6 +203,18 @@ public class Project {
 	public void removeMember(User member) {
 		this.members.remove(member);
 		member.addCreatedProject(null);
+	}
+	
+	public void addComment(Comment comment) {
+		this.comments.add(comment);
+	}
+
+	public void removeComment(Comment comment) {
+		this.comments.remove(comment);
+	}
+
+	public Set<Comment> getComments() {
+		return comments;
 	}
 
 }

@@ -8,7 +8,7 @@ public class KanbanCategoryRequest {
 	private Long id;
 	
 	private String title;
-		
+	
 	private Long projectId;
 
 	private int position;

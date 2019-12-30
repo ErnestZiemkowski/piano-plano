@@ -1,6 +1,8 @@
 package com.example.demo.model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -65,6 +68,12 @@ public class Card {
 	@JsonBackReference
 	private DailyGoal dailyGoal;
 	
+	@OneToMany(
+		fetch = FetchType.EAGER,
+		cascade = CascadeType.ALL,
+		orphanRemoval = true)
+	private Set<Comment> comments;
+	
 	public Card() {}
 
 	public static final class Builder {
@@ -74,6 +83,7 @@ public class Card {
 		private Integer position;
 		private User creator;
 		private KanbanCategory kanbanCategory;
+		private Set<Comment> comments = new HashSet<>();
 		
 		public Builder title(String name) {
 			this.title = name;
@@ -105,6 +115,11 @@ public class Card {
 			return this;
 		}
 		
+		public Builder addComment(Comment comment) {
+			this.comments.add(comment);
+			return this;
+		}
+		
 		public Card build() {
 			if (title.isEmpty()) {
 				throw new IllegalStateException("Title cannot be empty");
@@ -126,6 +141,7 @@ public class Card {
 			card.creator = this.creator;
 			kanbanCategory.addCard(card);
 			card.kanbanCategory = this.kanbanCategory;
+			card.comments = this.comments;
 			return card;
 		}
 	}
@@ -213,6 +229,14 @@ public class Card {
 	public void setDailyGoal(DailyGoal dailyGoal) {
 		this.dailyGoal = dailyGoal;
 	}
+	
+	public void addComment(Comment comment) {
+		this.comments.add(comment);
+	}
+
+	public void removeComment(Comment comment) {
+		this.comments.remove(comment);
+	}
 
 	@JsonGetter
 	public String getCardCode() {
@@ -229,4 +253,10 @@ public class Card {
 	public boolean isDailyGoalSet() {
 		return this.dailyGoal != null ? true : false;
 	}
+	
+	@JsonGetter
+	public String getKanbanCategoryTitle() {
+		return kanbanCategory.getTitle();
+	}
+
 }
