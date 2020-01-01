@@ -82,8 +82,8 @@ public class Project {
 		private String description;
 		private User creator;
 		private List<KanbanCategory> kanbanCategories = new ArrayList<>();
-		private Set<User> members = new HashSet<>();
-		private Set<Comment> comments = new HashSet<>();
+		private Set<User> members = new HashSet<User>();
+		private Set<Comment> comments = new HashSet<Comment>();
 		
 		public Builder name(String name) {
 			this.name = name;

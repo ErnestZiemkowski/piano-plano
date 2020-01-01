@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.demo.message.request.CommentRequest;
 import com.example.demo.model.Card;
+import com.example.demo.model.Comment;
 import com.example.demo.model.CommentType;
 import com.example.demo.model.KanbanCategory;
 import com.example.demo.model.Project;
@@ -76,6 +78,9 @@ public class CommentControllerTest {
 			KanbanCategory categoryToDo = KanbanCategory.createKanbanCategory("To Do", 1);
 			KanbanCategory categoryInProgress = KanbanCategory.createKanbanCategory("In Progress", 2);
 			KanbanCategory categoryDone = KanbanCategory.createKanbanCategory("Done", 3);
+			
+			Comment commentOne = Comment.createComment("This is test comment", user);
+			Comment commentTwo = Comment.createComment("This is test comment", user);
 
 			Project projectOne = Project.builder()
 					.name("Project test one")
@@ -84,6 +89,8 @@ public class CommentControllerTest {
 					.addKanbanCategory(categoryToDo)
 					.addKanbanCategory(categoryInProgress)
 					.addKanbanCategory(categoryDone)
+					.addComment(commentOne)
+					.addComment(commentTwo)
 					.build();
 
 			categoryToDo.setProject(projectOne);
@@ -96,6 +103,8 @@ public class CommentControllerTest {
 					.description("Card one description")
 					.position(0)
 					.kanbanCategory(categoryToDo)
+					.addComment(commentOne)
+					.addComment(commentTwo)
 					.build();
 
 			Card cardTwo = Card.builder()
@@ -126,7 +135,7 @@ public class CommentControllerTest {
 		
 		// when + then
 		mockMvc
-			.perform(post("/api/comment")
+			.perform(post("/api/comments")
 			.content(jsonComment)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
@@ -147,7 +156,7 @@ public class CommentControllerTest {
 		
 		// when + then
 		mockMvc
-			.perform(post("/api/comment")
+			.perform(post("/api/comments")
 			.content(jsonComment)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON))
@@ -157,4 +166,40 @@ public class CommentControllerTest {
 			.andExpect(jsonPath("$.createdAt").exists())
 			.andExpect(jsonPath("$.updatedAt").exists());
 	}	
+	
+	@Test
+	@WithMockUser("adam123")
+	public void getCommentsByProjectIdTest() throws Exception {
+		// when + then
+		mockMvc
+		.perform(get("/api/comments/project/{id}", 1)
+		.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$[0].id").value(1))
+		.andExpect(jsonPath("$[0].content").value("This is test comment"))
+		.andExpect(jsonPath("$[0].createdAt").exists())
+		.andExpect(jsonPath("$[0].updatedAt").exists())
+		.andExpect(jsonPath("$[1].id").value(2))
+		.andExpect(jsonPath("$[1].content").value("This is test comment"))
+		.andExpect(jsonPath("$[1].createdAt").exists())
+		.andExpect(jsonPath("$[1].updatedAt").exists());
+	}
+
+	@Test
+	@WithMockUser("adam123")
+	public void getCommentsByCardIdTest() throws Exception {
+		// when + then
+		mockMvc
+		.perform(get("/api/comments/card/{id}", 1)
+		.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$[0].id").value(1))
+		.andExpect(jsonPath("$[0].content").value("This is test comment"))
+		.andExpect(jsonPath("$[0].createdAt").exists())
+		.andExpect(jsonPath("$[0].updatedAt").exists())
+		.andExpect(jsonPath("$[1].id").value(2))
+		.andExpect(jsonPath("$[1].content").value("This is test comment"))
+		.andExpect(jsonPath("$[1].createdAt").exists())
+		.andExpect(jsonPath("$[1].updatedAt").exists());
+	}
 }

@@ -98,7 +98,7 @@ public class KanbanCategoryControllerTest {
 	@Test
 	@WithMockUser("adam123")
 	public void getAllProjectKanbanCategoriesTest() throws Exception {
-		// when + test
+		// when + then
 		mockMvc
 			.perform(get("/api/projects/{projectId}/kanban-categories", 1)
 			.accept(MediaType.APPLICATION_JSON))
@@ -114,7 +114,7 @@ public class KanbanCategoryControllerTest {
 	@Test
 	@WithMockUser("adam123")
 	public void deleteKanbanCategoryTest() throws Exception {
-		// when + test
+		// when + then
 		mockMvc
 			.perform(delete("/api/kanban-category/{id}", 4)
 			.accept(MediaType.APPLICATION_JSON))
@@ -158,7 +158,7 @@ public class KanbanCategoryControllerTest {
 		
 		String jsonKanbanCategory = gson.toJson(kanbanCategory);
 
-		// when + test
+		// when + then
 		mockMvc
 			.perform(put("/api/kanban-category/{id}", 3)
 			.content(jsonKanbanCategory)
@@ -188,7 +188,7 @@ public class KanbanCategoryControllerTest {
 		
 		String jsonKanbanCategories = gson.toJson(Arrays.asList(kanbanCategoryPositionZero, kanbanCategoryPositionOne));
 		
-		// when + test
+		// when + then
 		mockMvc
 			.perform(post("/api/kanban-category/rearange-position")
 			.content(jsonKanbanCategories)

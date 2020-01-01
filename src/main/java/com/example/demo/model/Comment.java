@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -26,6 +28,10 @@ public class Comment {
 	@NotBlank
 	@Size(max = 500)
 	private String content;
+	
+	@OneToOne
+	@JoinColumn(name = "user_id")
+	private User creator;
 		
 	@CreationTimestamp
 	private LocalDateTime createdAt;
@@ -35,12 +41,13 @@ public class Comment {
  	
 	public Comment() {}
 	
-	private Comment(String content) {
+	private Comment(String content, User creator) {
 		this.content = content;
+		this.creator = creator;
 	}
 	
-	public static Comment createComment(String content) {
-		return new Comment(content);
+	public static Comment createComment(String content, User creator) {
+		return new Comment(content, creator);
 	}
 	
 	public Long getId() {
@@ -57,6 +64,14 @@ public class Comment {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
 	}
 
 	public LocalDateTime getCreatedAt() {

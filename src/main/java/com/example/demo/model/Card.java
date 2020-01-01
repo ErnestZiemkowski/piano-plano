@@ -83,7 +83,7 @@ public class Card {
 		private Integer position;
 		private User creator;
 		private KanbanCategory kanbanCategory;
-		private Set<Comment> comments = new HashSet<>();
+		private Set<Comment> comments = new HashSet<Comment>();
 		
 		public Builder title(String name) {
 			this.title = name;
@@ -236,6 +236,10 @@ public class Card {
 
 	public void removeComment(Comment comment) {
 		this.comments.remove(comment);
+	}
+
+	public Set<Comment> getComments() {
+		return comments;
 	}
 
 	@JsonGetter
