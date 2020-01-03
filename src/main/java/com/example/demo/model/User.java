@@ -87,6 +87,9 @@ public class User {
 	@JsonBackReference
 	private Set<Project> participatingProjects;
 	
+	@ManyToMany
+	private Set<User> friends;
+	
 	public User() {}
 	
 	public static final class Builder {
@@ -97,6 +100,7 @@ public class User {
 		private Settings settings = new Settings();
 		private Set<Project> createdProjects = new HashSet<>();
 		private Set<Project> participatingProjects = new HashSet<>();
+		private Set<User> friends = new HashSet<>();
 		
 		public Builder username(String username) {
 			this.username = username;
@@ -128,6 +132,11 @@ public class User {
 			return this;
 		}		
 		
+		public Builder addFriend(User user) {
+			this.friends.add(user);
+			return this;
+		}
+		
 		public User build() {
 			if(username.isEmpty()) {
 				throw new IllegalStateException("Username cannot be empty");
@@ -149,6 +158,7 @@ public class User {
 			this.settings.setUser(user);
 			user.settings = this.settings;
 			user.createdProjects = this.createdProjects;
+			user.friends = this.friends;
 			return user;
 		}
 	}
@@ -231,4 +241,17 @@ public class User {
 	public Set<Project> getParticipatingProjects() {
 		return participatingProjects;
 	}	
+	
+	public void addFriend(User user) {
+		this.friends.add(user);
+	}
+	
+	public void removeFriend(User user) {
+		this.friends.remove(user);
+	}
+
+	public Set<User> getFriends() {
+		return friends;
+	}
+	
 }
