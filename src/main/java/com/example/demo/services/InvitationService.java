@@ -32,6 +32,7 @@ public class InvitationService {
 	}
 	
 	public Invitation createInvitation(InvitationRequest request) {
+		
 		Invitation invitation = Invitation.createInvitation(this.getLoggedUser(), request.getReceiverEmail());
 		return invitationRepository.save(invitation);
 	}
@@ -41,11 +42,13 @@ public class InvitationService {
 				.findById(id)
 				.orElseThrow(() -> new AppException("Invitation not found."));
 
-		if(invitation.getCreator().getEmail() != this.getLoggedUser().getEmail()) {
+		System.out.println(invitation.getReceiverEmail());
+		System.out.println(this.getLoggedUser().getEmail());
+		
+		if(!invitation.getReceiverEmail().equals(this.getLoggedUser().getEmail())) {
+			System.out.println("Cos sie zjebalo");
 			throw new AuthenticationServiceException("User unauthorized to modify this resource");
 		}
-		
-		System.out.println(invitation.getReceiverEmail());
 		
 		User friendToAdd = userRepository
 				.findByEmail(invitation.getReceiverEmail())
@@ -55,8 +58,10 @@ public class InvitationService {
 		
 		invitation.setAccepted();
 		owner.addFriend(friendToAdd);
-
+		friendToAdd.addFriend(owner);
+		
 		invitationRepository.save(invitation);
+		userRepository.save(friendToAdd);
 		userRepository.save(owner);
 
 		return friendToAdd;

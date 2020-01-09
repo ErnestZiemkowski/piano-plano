@@ -12,7 +12,7 @@ import com.example.demo.model.Invitation;
 @Repository
 public interface InvitationRepository extends JpaRepository<Invitation, Long> {
 	
-	@Query(value = "SELECT I FROM Invitation I WHERE I.creator.email = :email AND I.isAccepted = false")
+	@Query(value = "SELECT I FROM Invitation I WHERE I.receiverEmail = :email AND I.isAccepted = false")
 	Set<Invitation> getInvitationsByEmail(@Param("email") String email);
 	
 }

@@ -52,9 +52,13 @@ public class Card {
 	private int position;
 	
 	@OneToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "creator_id")
 	private User creator;
 	
+	@OneToOne
+	@JoinColumn(name = "assignee_id")
+	private User assignee;
+		
 	@ManyToOne
 	@JoinColumn(name = "kanban_category_id")
 	@JsonBackReference
@@ -82,6 +86,7 @@ public class Card {
 		private boolean isDone = false;
 		private Integer position;
 		private User creator;
+		private User assignee;
 		private KanbanCategory kanbanCategory;
 		private Set<Comment> comments = new HashSet<Comment>();
 		
@@ -109,6 +114,11 @@ public class Card {
 			this.creator = creator;
 			return this;
 		}
+		
+		public Builder assignee(User assignee) {
+			this.assignee = assignee;
+			return this;
+		}	
 		
 		public Builder kanbanCategory(KanbanCategory kanbanCategory) {
 			this.kanbanCategory = kanbanCategory;
@@ -139,6 +149,7 @@ public class Card {
 			card.isDone = this.isDone;
 			card.position = this.position;
 			card.creator = this.creator;
+			card.assignee = this.assignee;
 			kanbanCategory.addCard(card);
 			card.kanbanCategory = this.kanbanCategory;
 			card.comments = this.comments;
@@ -214,6 +225,14 @@ public class Card {
 		this.creator = creator;
 	}
 
+	public User getAssignee() {
+		return assignee;
+	}
+	
+	public void setAssignee(User assignee) {
+		this.assignee = assignee;
+	}
+	
 	public KanbanCategory getKanbanCategory() {
 		return kanbanCategory;
 	}
@@ -262,5 +281,10 @@ public class Card {
 	public String getKanbanCategoryTitle() {
 		return kanbanCategory.getTitle();
 	}
+	
+	@JsonGetter
+	public Set<User> getProjectMembers() {
+		return kanbanCategory.getProject().getMembers();
+	} 
 
 }

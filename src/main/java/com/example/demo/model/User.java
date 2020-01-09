@@ -76,9 +76,6 @@ public class User {
 		mappedBy = "creator",
 		cascade = {
 			CascadeType.PERSIST,
-			CascadeType.REFRESH,
-			CascadeType.MERGE,
-			CascadeType.DETACH
 		})
 	@JsonBackReference
 	private Set<Project> createdProjects;
@@ -88,6 +85,7 @@ public class User {
 	private Set<Project> participatingProjects;
 	
 	@ManyToMany
+	@JsonBackReference
 	private Set<User> friends;
 	
 	public User() {}
@@ -236,6 +234,14 @@ public class User {
 
 	public Set<Project> getCreatedProjects() {
 		return createdProjects;
+	}
+	
+	public void addParticipatingProject(Project project) {
+		this.participatingProjects.add(project);
+	}
+
+	public void removeParticipatingProject(Project project) {
+		this.participatingProjects.remove(project);
 	}
 
 	public Set<Project> getParticipatingProjects() {

@@ -44,7 +44,7 @@ public class CardService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User loggedUser = userRepository
 				.findByUsername(auth.getName())
-				.orElseThrow(() -> new AppException("User Role not set."));
+				.orElseThrow(() -> new AppException("User does not exists."));
 		
 		Project project = projectRepository
 				.findById(cardRequest.getProjectId())
@@ -82,6 +82,17 @@ public class CardService {
 			card.setKanbanCategory(kanbanCategory);
 		}
 		
+		if (cardRequest.getAssignee() != null) {
+			if (cardRequest.getAssignee().equals("unassigned")) {
+				card.setAssignee(null);
+			} else {
+				User assignee = userRepository
+						.findByUsername(cardRequest.getAssignee())
+						.orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardRequest.getAssignee()));
+				card.setAssignee(assignee);	
+			}	
+		}
+				
 		return cardRepository.save(card);
 	}
 	

@@ -45,7 +45,6 @@ public class Project {
 	
 	@ManyToOne(cascade = {
 		CascadeType.PERSIST,
-		CascadeType.MERGE
 	})
 	@JoinColumn(name = "user_id")
 	@JsonManagedReference
@@ -53,9 +52,11 @@ public class Project {
 
 	@ManyToMany(cascade = {
 			CascadeType.PERSIST,
-			CascadeType.MERGE})
+			CascadeType.MERGE,
+			CascadeType.DETACH,
+			})
 	@JoinTable(
-		name = "project_members",
+		name = "projects_members",
 		joinColumns = @JoinColumn(name = "project_id"),
 		inverseJoinColumns = @JoinColumn(name = "user_id"))
 	@JsonManagedReference
@@ -197,12 +198,12 @@ public class Project {
 	
 	public void addMember(User member) {
 		this.members.add(member);
-		member.addCreatedProject(this);
+		member.addParticipatingProject(this);
 	}
 
 	public void removeMember(User member) {
 		this.members.remove(member);
-		member.addCreatedProject(null);
+		member.addParticipatingProject(null);
 	}
 	
 	public void addComment(Comment comment) {
@@ -215,6 +216,10 @@ public class Project {
 
 	public Set<Comment> getComments() {
 		return comments;
+	}
+
+	public Set<User> getMembers() {
+		return members;
 	}
 
 }

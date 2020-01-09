@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class DailyGoalsService {
 	}
 	
 	@Transactional
+	@Modifying(clearAutomatically = true)
 	public void setCardAsDailyGoal(Long cardId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User loggedUser = userRepository

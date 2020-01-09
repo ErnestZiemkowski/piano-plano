@@ -72,11 +72,19 @@ public class ProjectControllerTest {
 					.addRole(roleUser)
 					.email("eve69@demo.com")
 					.build();
-					
+
+			User tom = User.builder()
+					.username("thomas")
+					.password(new BCryptPasswordEncoder().encode("thomas"))
+					.addRole(roleUser)
+					.email("thomas@demo.com")
+					.build();
+
 			Project projectOne = Project.builder()
 					.name("Project test one")
 					.description("test")
 					.creator(adam)
+					.addMember(tom)
 					.build();
 
 			Project projectTwo = Project.builder()
@@ -89,11 +97,10 @@ public class ProjectControllerTest {
 					.name("Project test three")
 					.description("test")
 					.creator(eve)
-					.addMember(adam)
 					.build();
 
 			roleRepository.save(roleUser);
-			userRepository.saveAll(Arrays.asList(adam, eve));
+			userRepository.saveAll(Arrays.asList(adam, eve, tom));
 			projectRepository.saveAll(Arrays.asList(projectOne, projectTwo, projectThree));		
 			initialized = true;
 		}
@@ -107,7 +114,7 @@ public class ProjectControllerTest {
 			.perform(get("/api/projects")
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].name").value("Project test one"))
+			.andExpect(jsonPath("$[0].name").value("Project Create Test"))
 			.andExpect(jsonPath("$[0].description").exists())
 			.andExpect(jsonPath("$[0].creator").exists())
 			.andExpect(jsonPath("$[1].name").value("Project Create Test"))
@@ -147,7 +154,7 @@ public class ProjectControllerTest {
 
 	@Test
 	@WithMockUser("adam123")
-	public void updateUserTest() throws Exception {
+	public void updateProjectTest() throws Exception {
 		// given
 		Gson gson = new Gson();
 		ProjectRequest project = new ProjectRequest(null, "This is updated description");
@@ -161,5 +168,44 @@ public class ProjectControllerTest {
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.description").value("This is updated description"));
-	}	
+	}
+	
+	@Test
+	@WithMockUser("adam123")
+	public void removeFriendFromProjectTest() throws Exception {
+		// given
+		Gson gson = new Gson();
+		ProjectRequest project = new ProjectRequest();
+		project.setFriendToAddId((long) 2);
+		String jsonProject = gson.toJson(project);
+		
+		// when + test
+		mockMvc
+			.perform(put("/api/projects/{id}/members", 1)
+			.content(jsonProject)
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.members").isEmpty());		
+	}
+
+	@Test
+	@WithMockUser("adam123")
+	public void addFriendToProjectTest() throws Exception {
+		// given
+		Gson gson = new Gson();
+		ProjectRequest project = new ProjectRequest();
+		project.setFriendToAddId((long) 3);
+		String jsonProject = gson.toJson(project);
+		
+		// when + test
+		mockMvc
+			.perform(put("/api/projects/{id}/members", 1)
+			.content(jsonProject)
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.members").isNotEmpty());		
+	}
+
 }

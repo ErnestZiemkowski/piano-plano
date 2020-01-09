@@ -55,4 +55,10 @@ public class ProjectController {
 		
 		return new ResponseMessage(responseMessage);
 	}
+	
+	@PutMapping("/{id}/members")
+	@PreAuthorize("hasRole('USER')")
+	public Project addOrRemoveProjectMember(@RequestBody ProjectRequest projectRequest, @PathVariable Long id) {
+		return projectService.addOrRemoveFriendToProject(projectRequest, id);
+	}
 }

@@ -9,6 +9,8 @@ public class CardRequest {
 	
 	private String description;
 
+	private String assignee;
+	
 	private boolean isDone;
 	
 	private int kanbanCategoryPosition;
@@ -23,6 +25,7 @@ public class CardRequest {
 		private Long id;
 		private String title;
 		private String description;
+		private String assignee;
 		private boolean isDone = false;
 		private Integer position;
 		private Long projectId;
@@ -39,6 +42,11 @@ public class CardRequest {
 
 		public Builder description(String description) {
 			this.description = description;
+			return this;
+		}
+		
+		public Builder assignee(String assignee) {
+			this.assignee = assignee;
 			return this;
 		}
 		
@@ -74,6 +82,7 @@ public class CardRequest {
 			request.id = this.id;
 			request.title = this.title;
 			request.description = this.description;
+			request.assignee = this.assignee;
 			request.isDone = this.isDone;
 			request.kanbanCategoryPosition = this.position;
 			request.projectId = this.projectId;
@@ -107,6 +116,14 @@ public class CardRequest {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getAssignee() {
+		return assignee;
+	}
+
+	public void setAssignee(String assignee) {
+		this.assignee = assignee;
 	}
 
 	public int getKanbanCategoryPosition() {

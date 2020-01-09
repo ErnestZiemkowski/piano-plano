@@ -3,7 +3,10 @@ package com.example.demo.services;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -70,5 +73,31 @@ public class ProjectService {
 
 	public void deleteProjectById(Long id) {
 		projectRepository.deleteById(id);
+	}
+	
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	public Project addOrRemoveFriendToProject(ProjectRequest projectRequest, Long id) {
+		Project project = projectRepository
+				.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Project", "id", id));
+
+		User memberOfProject = projectRepository
+				.getMemberOfProject(projectRequest.getFriendToAddId(), id);
+
+		if(memberOfProject == null) {	
+			User friendToAdd = userRepository
+					.findById(projectRequest.getFriendToAddId())
+					.orElseThrow(() -> new ResourceNotFoundException("User", "id", projectRequest.getFriendToAddId()));
+			project.addMember(friendToAdd);
+			projectRepository.save(project);
+			
+		} else {
+			System.out.println(memberOfProject.getEmail());
+			project.removeMember(memberOfProject);
+			projectRepository.save(project);
+		}
+
+		return project;
 	}
 }
