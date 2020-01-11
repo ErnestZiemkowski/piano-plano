@@ -67,7 +67,8 @@ public class Card {
 	@OneToOne(
 		mappedBy = "card",
 		cascade = CascadeType.ALL,
-		fetch = FetchType.EAGER
+		fetch = FetchType.EAGER,
+		orphanRemoval = true
 	)
 	@JsonBackReference
 	private DailyGoal dailyGoal;

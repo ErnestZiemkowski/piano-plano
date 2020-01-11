@@ -13,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.example.demo.exception.AppException;
 import com.example.demo.message.request.SettingsRequest;
 import com.example.demo.model.Role;
 import com.example.demo.model.RoleName;
@@ -48,7 +49,10 @@ public class SettingsControllerTest {
 	public void init() {
 		if (!initialized) {
 			// given
-			Role roleUser = Role.createRole(RoleName.ROLE_USER);
+		    Role roleUser = roleRepository
+		    		.findByName(RoleName.ROLE_USER)
+		    		.orElseThrow(() -> new AppException("User Role not set."));
+
 			User user = User.builder()
 					.username("adam123")
 					.password("adam123")

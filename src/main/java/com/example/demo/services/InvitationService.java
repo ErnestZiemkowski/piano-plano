@@ -41,14 +41,8 @@ public class InvitationService {
 		Invitation invitation = invitationRepository
 				.findById(id)
 				.orElseThrow(() -> new AppException("Invitation not found."));
-
-		System.out.println(invitation.getReceiverEmail());
-		System.out.println(this.getLoggedUser().getEmail());
 		
-		if(!invitation.getReceiverEmail().equals(this.getLoggedUser().getEmail())) {
-			System.out.println("Cos sie zjebalo");
-			throw new AuthenticationServiceException("User unauthorized to modify this resource");
-		}
+		if(!invitation.getReceiverEmail().equals(this.getLoggedUser().getEmail())) throw new AuthenticationServiceException("User unauthorized to modify this resource");
 		
 		User friendToAdd = userRepository
 				.findByEmail(invitation.getReceiverEmail())

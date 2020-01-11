@@ -76,6 +76,9 @@ public class KanbanCategoryService {
 					.orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardRequest.getId()));
 				card.setPosition(j);
 				card.setKanbanCategory(kanbanCategory);
+				
+				handleSettingCardAsDone(kanbanCategoryRequest, card, j);
+				
 				cardRepository.save(card);
 			}
 			
@@ -83,6 +86,14 @@ public class KanbanCategoryService {
 		}
 		
 		return kanbanCategories;
+	}
+	
+	private void handleSettingCardAsDone(KanbanCategoryRequest kanbanCategoryRequest, Card card, int j) {
+		if (j == kanbanCategoryRequest.getCards().size() - 1) {
+			card.setDone(true);
+		} else {
+			card.setDone(false);
+		}		
 	}
 	
 }

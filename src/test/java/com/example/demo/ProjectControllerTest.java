@@ -1,8 +1,10 @@
 package com.example.demo;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.example.demo.exception.AppException;
 import com.example.demo.message.request.ProjectRequest;
 import com.example.demo.model.Project;
 import com.example.demo.model.Role;
@@ -58,7 +61,10 @@ public class ProjectControllerTest {
 	public void init() {
 		if (!initialized) {
 			// given
-			Role roleUser = Role.createRole(RoleName.ROLE_USER);
+		    Role roleUser = roleRepository
+		    		.findByName(RoleName.ROLE_USER)
+		    		.orElseThrow(() -> new AppException("User Role not set."));
+
 			User adam = User.builder()
 					.username("adam123")
 					.password(new BCryptPasswordEncoder().encode("adam123"))
@@ -84,7 +90,6 @@ public class ProjectControllerTest {
 					.name("Project test one")
 					.description("test")
 					.creator(adam)
-					.addMember(tom)
 					.build();
 
 			Project projectTwo = Project.builder()
@@ -114,12 +119,7 @@ public class ProjectControllerTest {
 			.perform(get("/api/projects")
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$[0].name").value("Project Create Test"))
-			.andExpect(jsonPath("$[0].description").exists())
-			.andExpect(jsonPath("$[0].creator").exists())
-			.andExpect(jsonPath("$[1].name").value("Project Create Test"))
-			.andExpect(jsonPath("$[1].description").exists())
-			.andExpect(jsonPath("$[1].creator").exists());
+			.andExpect(jsonPath("$", Matchers.hasSize(2)));
 	}
 	
 	@Test
@@ -138,8 +138,8 @@ public class ProjectControllerTest {
 	public void createProjectTest() throws Exception {
 		// given
 		Gson gson = new Gson();
-		ProjectRequest project = new ProjectRequest("Project Create Test", "This is create test description");
-		String jsonProject = gson.toJson(project);
+		ProjectRequest request = new ProjectRequest("Project Create Test", "This is create test description");
+		String jsonProject = gson.toJson(request);
 		
 		// when + then
 		mockMvc
@@ -157,8 +157,8 @@ public class ProjectControllerTest {
 	public void updateProjectTest() throws Exception {
 		// given
 		Gson gson = new Gson();
-		ProjectRequest project = new ProjectRequest(null, "This is updated description");
-		String jsonProject = gson.toJson(project);
+		ProjectRequest request = new ProjectRequest(null, "This is updated description");
+		String jsonProject = gson.toJson(request);
 
 		// when + then		
 		mockMvc
@@ -175,9 +175,9 @@ public class ProjectControllerTest {
 	public void removeFriendFromProjectTest() throws Exception {
 		// given
 		Gson gson = new Gson();
-		ProjectRequest project = new ProjectRequest();
-		project.setFriendToAddId((long) 2);
-		String jsonProject = gson.toJson(project);
+		ProjectRequest request = new ProjectRequest();
+		request.setFriendToAddId((long) 2);
+		String jsonProject = gson.toJson(request);
 		
 		// when + test
 		mockMvc
@@ -194,9 +194,9 @@ public class ProjectControllerTest {
 	public void addFriendToProjectTest() throws Exception {
 		// given
 		Gson gson = new Gson();
-		ProjectRequest project = new ProjectRequest();
-		project.setFriendToAddId((long) 3);
-		String jsonProject = gson.toJson(project);
+		ProjectRequest request = new ProjectRequest();
+		request.setFriendToAddId((long) 2);
+		String jsonProject = gson.toJson(request);
 		
 		// when + test
 		mockMvc

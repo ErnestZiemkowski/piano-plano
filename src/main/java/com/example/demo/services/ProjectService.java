@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.transaction.Transactional;
@@ -18,6 +17,7 @@ import com.example.demo.model.Project;
 import com.example.demo.model.User;
 import com.example.demo.repository.ProjectRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.utils.Utils;
 
 @Service
 public class ProjectService {
@@ -28,21 +28,13 @@ public class ProjectService {
 	@Autowired
 	private UserRepository userRepository;
 	
-	public static <T> Set<T> mergeSet(Set<T> a, Set<T> b) {
-		Set<T> mergeSet = new HashSet<T>();
-		mergeSet.addAll(a);
-		mergeSet.addAll(b);
-		
-		return mergeSet;
-	}
-
 	public Set<Project> getProjectsOfLoggedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		User loggedUser = userRepository
 				.findByUsername(auth.getName())
 				.orElseThrow(() -> new AppException("User Role not set."));
 		
-		return mergeSet(loggedUser.getCreatedProjects(), loggedUser.getParticipatingProjects());
+		return Utils.mergeSet(loggedUser.getCreatedProjects(), loggedUser.getParticipatingProjects());
 	}	
 	
 	public Project createProject(ProjectRequest projectRequest) {

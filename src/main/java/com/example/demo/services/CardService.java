@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +39,7 @@ public class CardService {
 				.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Card", "id", id));		
 		card.setKanbanCategory(null);
+		card.setDailyGoal(null);
 		cardRepository.deleteById(id);
 	}
 	
@@ -78,22 +81,35 @@ public class CardService {
 			KanbanCategory kanbanCategory = kanbanCategoryRepository
 					.findById(cardRequest.getKanbanCategoryId())
 					.orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardRequest.getKanbanCategoryId()));
-	
+		
+			List<KanbanCategory> kanbanCategories = card.getKanbanCategory().getProject().getKanbanCategories();
+			handleSettingCardAsDone(kanbanCategories, kanbanCategory, card);
+			
 			card.setKanbanCategory(kanbanCategory);
 		}
 		
-		if (cardRequest.getAssignee() != null) {
-			if (cardRequest.getAssignee().equals("unassigned")) {
-				card.setAssignee(null);
-			} else {
-				User assignee = userRepository
-						.findByUsername(cardRequest.getAssignee())
-						.orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardRequest.getAssignee()));
-				card.setAssignee(assignee);	
-			}	
-		}
-				
+		if (cardRequest.getAssignee() != null) handleAssigningUserToCard(cardRequest, card);
+						
 		return cardRepository.save(card);
+	}
+	
+	private void handleAssigningUserToCard(CardRequest cardRequest, Card card) {
+		if (cardRequest.getAssignee().equals("unassigned")) {
+			card.setAssignee(null);
+		} else {
+			User assignee = userRepository
+					.findByUsername(cardRequest.getAssignee())
+					.orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardRequest.getAssignee()));
+			card.setAssignee(assignee);	
+		}			
+	}
+	
+	private void handleSettingCardAsDone(List<KanbanCategory> kanbanCategories, KanbanCategory kanbanCategory, Card card) {
+		if(kanbanCategories.get(kanbanCategories.size() - 1) == kanbanCategory) {
+			card.setDone(true);
+		} else {
+			card.setDone(false);
+		}	
 	}
 	
 }

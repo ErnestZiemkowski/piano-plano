@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-
+import com.example.demo.exception.AppException;
 import com.example.demo.message.request.LoginForm;
 import com.example.demo.message.request.SignUpForm;
 import com.example.demo.model.Role;
@@ -49,7 +49,10 @@ public class AuthControllerTest {
 	public void init() {
 		if (!initialized) {
 			// given
-			Role roleUser = Role.createRole(RoleName.ROLE_USER);
+		    Role roleUser = roleRepository
+		    		.findByName(RoleName.ROLE_USER)
+		    		.orElseThrow(() -> new AppException("User Role not set."));
+
 			User user = User.builder()
 					.username("admin123")
 					.password(new BCryptPasswordEncoder().encode("admin123"))

@@ -3,6 +3,7 @@ package com.example.demo.model;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,7 +32,10 @@ public class DailyGoal {
 	
 	private Date expiresAt;
 	
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(
+		fetch = FetchType.EAGER,
+		cascade = CascadeType.ALL
+	)
 	@JoinColumn(name = "card_id")
 	@JsonManagedReference
 	private Card card;

@@ -22,6 +22,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.example.demo.exception.AppException;
 import com.example.demo.message.request.CardRequest;
 import com.example.demo.model.Card;
 import com.example.demo.model.KanbanCategory;
@@ -66,7 +67,10 @@ public class CardControllerTest {
 	public void init() {
 		if (!initialized) {
 			// given
-			Role roleUser = Role.createRole(RoleName.ROLE_USER);
+		    Role roleUser = roleRepository
+		    		.findByName(RoleName.ROLE_USER)
+		    		.orElseThrow(() -> new AppException("User Role not set."));
+
 			User user = User.builder()
 					.username("adam123")
 					.password(new BCryptPasswordEncoder().encode("adam123"))
@@ -150,7 +154,6 @@ public class CardControllerTest {
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.createDateTime").exists())
 			.andExpect(jsonPath("$.title").value("Test Card title"))
 			.andExpect(jsonPath("$.description").value("Test Card description"));
 	}
@@ -177,7 +180,6 @@ public class CardControllerTest {
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.createDateTime").exists())
 			.andExpect(jsonPath("$.title").value("Test Card UPDATED"))
 			.andExpect(jsonPath("$.description").value("Test Card UPDATED"));
 	}
