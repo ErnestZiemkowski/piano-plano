@@ -77,7 +77,7 @@ public class KanbanCategoryService {
 				card.setPosition(j);
 				card.setKanbanCategory(kanbanCategory);
 				
-				handleSettingCardAsDone(kanbanCategoryRequest, card, j);
+				handleSettingCardAsDone(kanbanCategoriesRequests, card, i);
 				
 				cardRepository.save(card);
 			}
@@ -88,8 +88,9 @@ public class KanbanCategoryService {
 		return kanbanCategories;
 	}
 	
-	private void handleSettingCardAsDone(KanbanCategoryRequest kanbanCategoryRequest, Card card, int j) {
-		if (j == kanbanCategoryRequest.getCards().size() - 1) {
+	private void handleSettingCardAsDone(ArrayList<KanbanCategoryRequest> kanbanCategoriesRequests, Card card, int i) {
+//		if (j == kanbanCategoryRequest.getCards().size() - 1) {
+		if (i == kanbanCategoriesRequests.size() - 1 ) {
 			card.setDone(true);
 		} else {
 			card.setDone(false);
