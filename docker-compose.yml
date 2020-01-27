@@ -1,0 +1,57 @@
+version: '3.3'
+services:
+    # Database
+    db:
+        image: mysql:5.7
+        container_name: db
+        restart: always
+        volumes:
+            - data-mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: piano-plano-db
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "3307:3307"
+        networks: 
+            - backend
+    # Backend Service
+    piano-plano:
+        image: ernestziemkowski/piano-plano:latest
+        restart: always
+        container_name: piano-plano
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:mysql://db/piano-plano-db?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+            SPRING_DATASOURCE_USERNAME: user
+            SPRING_DATASOURCE_PASSWORD: password
+        depends_on:
+            - db
+        ports:
+            - "5000:5000"
+        networks: 
+            - backend
+            - frontend
+    # Frontend Service
+    piano-plano-client:
+        image: ernestziemkowski/piano-plano-client:latest
+        container_name: piano-plano-client
+        restart: always
+        environment:
+            - API_URL=http://127.0.0.1:5000
+        depends_on:
+            - piano-plano
+        ports:
+            - "6000:6000"
+        networks:
+            - frontend
+
+volumes:
+  data-mysql:
+    driver: local
+
+networks:
+    backend:
+        driver: bridge
+    frontend:
+        driver: bridge
