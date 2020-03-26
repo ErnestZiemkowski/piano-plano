@@ -1,4 +1,4 @@
-language: bash
+language: java
 
 sudo: required
 
@@ -6,4 +6,4 @@ services:
 - docker
 
 script:
-- mvn clean install 
+- mvn test -B
