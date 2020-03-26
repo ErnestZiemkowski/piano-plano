@@ -1,0 +1,13 @@
+language: java
+
+sudo: required
+
+services: 
+- docker
+- mysql
+
+before_install:
+- mysql -e 'CREATE DATABASE piano_plano_db;'
+
+script:
+- mvn test -B
