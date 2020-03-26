@@ -7,7 +7,7 @@ services:
 - mysql
 
 before_install:
-- mysql -e 'CREATE DATABASE piano-plano-db;'
+- mysql -e 'CREATE DATABASE piano_plano_db;'
 
 script:
 - mvn test -B
